@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540" font-family="'Segoe UI', Arial, sans-serif" font-size="12">
+<title>Ngày 0 · Chuẩn bị</title>
+<defs>
+<marker id="a-http" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C0392B"/></marker>
+<marker id="a-ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2F6DB5"/></marker>
+<marker id="a-di" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7A4FB5"/></marker>
+<marker id="a-push" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#D35400"/></marker>
+<marker id="a-local" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#777777"/></marker>
+</defs>
+<rect x="0" y="0" width="1200" height="540" fill="#FCFAF4"/>
+<text x="40" y="42" font-size="22" font-weight="700" fill="#222">Ngày 0 · Chuẩn bị</text>
+<text x="40" y="64" font-size="13" fill="#555">Chỉ có terminal và workspace rỗng. Chưa có app nào; thư mục docs/ chờ ghi ADR và retro.</text>
+<rect x="40" y="100" width="12" height="12" rx="2" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="60" y="110" font-size="12" fill="#333">Mới: 2 khối · cập nhật: 0 khối · quan hệ mới: 0 · khối và mũi tên mờ: đã có từ trước, không đổi trong ngày</text>
+<rect x="26" y="128" width="345" height="232" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#E67E22" stroke-width="2.4"/>
+<g>
+<rect x="40" y="160" width="317" height="69" rx="8" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="52" y="181" font-size="12.5" font-weight="700" fill="#222">Terminal · Angular CLI v22 + npm</text>
+<text x="52" y="200" font-size="11" fill="#555">ng new eduhub --create-application=false</text>
+<text x="52" y="215" font-size="11" fill="#555">npm run verify = lint + test + build</text>
+<rect x="315" y="151" width="34" height="18" rx="9" fill="#E67E22" stroke="#E67E22" stroke-width="1.4"/>
+<text x="332.0" y="164" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">MỚI</text>
+</g>
+<g>
+<rect x="40" y="290" width="317" height="54" rx="8" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="52" y="311" font-size="12.5" font-weight="700" fill="#222">docs/</text>
+<text x="52" y="330" font-size="11" fill="#555">journal.md · decisions.md (ADR)</text>
+<rect x="315" y="281" width="34" height="18" rx="9" fill="#E67E22" stroke="#E67E22" stroke-width="1.4"/>
+<text x="332.0" y="294" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">MỚI</text>
+</g>
+<rect x="34" y="134" width="98" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="40" y="148" font-size="12.5" font-weight="700" fill="#E67E22">Máy dev &amp; CI</text>
+<rect x="787" y="426" width="40" height="16" rx="4" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="837" y="438" font-size="11.5" fill="#333">Viền cam / số đặc = thêm trong ngày · chữ cam = dòng mới</text>
+<text x="40" y="480" font-size="14" font-weight="700" fill="#222">Quan hệ giữa các thành phần (số trên mũi tên)</text>
+</svg>

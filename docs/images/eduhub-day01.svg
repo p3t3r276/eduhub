@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1227" height="586" viewBox="0 0 1227 586" font-family="'Segoe UI', Arial, sans-serif" font-size="12">
+<title>Ngày 1 · Dựng workspace và shell</title>
+<defs>
+<marker id="a-http" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C0392B"/></marker>
+<marker id="a-ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2F6DB5"/></marker>
+<marker id="a-di" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7A4FB5"/></marker>
+<marker id="a-push" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#D35400"/></marker>
+<marker id="a-local" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#777777"/></marker>
+</defs>
+<rect x="0" y="0" width="1227" height="586" fill="#FCFAF4"/>
+<text x="40" y="42" font-size="22" font-weight="700" fill="#222">Ngày 1 · Dựng workspace và shell</text>
+<text x="40" y="64" font-size="13" fill="#555">Shell zoneless đầu tiên, import 7 lib qua path alias @eduhub/*.</text>
+<rect x="40" y="100" width="12" height="12" rx="2" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="60" y="110" font-size="12" fill="#333">Mới: 2 khối · cập nhật: 1 khối · quan hệ mới: 2 · khối và mũi tên mờ: đã có từ trước, không đổi trong ngày</text>
+<rect x="26" y="128" width="345" height="232" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#6B6B6B" stroke-width="1.6"/>
+<rect x="413" y="128" width="774" height="161" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#E67E22" stroke-width="2.4"/>
+<rect x="427" y="158" width="345" height="117" rx="10" fill="#FFFFFF" fill-opacity="0.0" stroke="#E67E22" stroke-width="2.4" stroke-dasharray="5 4"/>
+<rect x="828" y="158" width="345" height="102" rx="10" fill="#FFFFFF" fill-opacity="0.0" stroke="#E67E22" stroke-width="2.4" stroke-dasharray="5 4"/>
+<g>
+<rect x="40" y="160" width="317" height="84" rx="8" fill="#FFFFFF" stroke="#6B6B6B" stroke-width="1.4"/>
+<text x="52" y="181" font-size="12.5" font-weight="700" fill="#222">Terminal · Angular CLI v22 + npm</text>
+<text x="52" y="200" font-size="11" fill="#555">ng new eduhub --create-application=false</text>
+<text x="52" y="215" font-size="11" fill="#555">npm run verify = lint + test + build</text>
+<text x="52" y="230" font-size="11" font-weight="700" fill="#E67E22">+ ng serve shell · ng build &lt;app&gt;</text>
+<rect x="283" y="151" width="66" height="18" rx="9" fill="#FFFFFF" stroke="#E67E22" stroke-width="1.4"/>
+<text x="316.0" y="164" text-anchor="middle" font-size="10.5" font-weight="700" fill="#E67E22">CẬP NHẬT</text>
+</g>
+<g opacity="0.32">
+<rect x="40" y="290" width="317" height="54" rx="8" fill="#FFFFFF" stroke="#6B6B6B" stroke-width="1.4"/>
+<text x="52" y="311" font-size="12.5" font-weight="700" fill="#222">docs/</text>
+<text x="52" y="330" font-size="11" fill="#555">journal.md · decisions.md (ADR)</text>
+</g>
+<g>
+<rect x="441" y="190" width="317" height="69" rx="8" fill="#DDF2F1" stroke="#E67E22" stroke-width="3"/>
+<text x="453" y="211" font-size="12.5" font-weight="700" fill="#222">Shell app · bootstrapApplication</text>
+<text x="453" y="230" font-size="11" fill="#555">zoneless · standalone · OnPush</text>
+<text x="453" y="245" font-size="11" fill="#555">router lazy (loadComponent)</text>
+<rect x="716" y="181" width="34" height="18" rx="9" fill="#E67E22" stroke="#E67E22" stroke-width="1.4"/>
+<text x="733.0" y="194" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">MỚI</text>
+</g>
+<g>
+<rect x="842" y="190" width="317" height="54" rx="8" fill="#E3EEFA" stroke="#E67E22" stroke-width="3"/>
+<text x="854" y="211" font-size="12.5" font-weight="700" fill="#222">@eduhub/* path alias (tsconfig)</text>
+<text x="854" y="230" font-size="11" fill="#555">trỏ thẳng src/public-api.ts, không qua dist</text>
+<rect x="1117" y="181" width="34" height="18" rx="9" fill="#E67E22" stroke="#E67E22" stroke-width="1.4"/>
+<text x="1134.0" y="194" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">MỚI</text>
+</g>
+<path d="M357.0,202.0 C397.0,202.0 401.0,224.5 441.0,224.5" fill="none" stroke="#2F6DB5" stroke-width="3" stroke-dasharray="7 4" marker-end="url(#a-ctrl)"/>
+<path d="M758.0,224.5 C798.0,224.5 802.0,217.0 842.0,217.0" fill="none" stroke="#7A4FB5" stroke-width="3" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<g>
+<circle cx="399.0" cy="213.2" r="10.5" fill="#2F6DB5" stroke="#2F6DB5" stroke-width="1.6"/>
+<text x="399.0" y="217.2" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">1</text>
+</g>
+<g>
+<circle cx="800.0" cy="220.8" r="10.5" fill="#7A4FB5" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="800.0" y="224.8" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">2</text>
+</g>
+<rect x="34" y="134" width="98" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="40" y="148" font-size="12.5" font-weight="700" fill="#333">Máy dev &amp; CI</text>
+<rect x="421" y="134" width="196" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="427" y="148" font-size="12.5" font-weight="700" fill="#E67E22">Trình duyệt · origin :4200</text>
+<rect x="435" y="164" width="84" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="441" y="178" font-size="12.5" font-weight="700" fill="#E67E22">apps/shell</text>
+<rect x="836" y="164" width="189" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="842" y="178" font-size="12.5" font-weight="700" fill="#E67E22">projects/libs · @eduhub/*</text>
+<line x1="40" y1="410" x2="80" y2="410" stroke="#2F6DB5" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#a-ctrl)"/>
+<text x="90" y="414" font-size="11.5" fill="#333">Điều khiển: CLI, test runner, CI chạy / build / đo</text>
+<line x1="422" y1="410" x2="462" y2="410" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<text x="472" y="414" font-size="11.5" fill="#333">DI / import / đọc signal giữa các khối code</text>
+<rect x="805" y="426" width="40" height="16" rx="4" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="855" y="438" font-size="11.5" fill="#333">Viền cam / số đặc = thêm trong ngày · chữ cam = dòng mới</text>
+<text x="40" y="480" font-size="14" font-weight="700" fill="#222">Quan hệ giữa các thành phần (số trên mũi tên)</text>
+<g>
+<circle cx="50" cy="506" r="9.5" fill="#2F6DB5" stroke="#2F6DB5" stroke-width="1.5"/>
+<text x="50" y="510" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">1</text>
+<text x="68" y="510" font-size="11.5" font-weight="700" fill="#333">Terminal · Angular CLI v22 + npm → Shell app · bootstrapApplication</text>
+<text x="68" y="526" font-size="11.5" fill="#E67E22">ng serve / ng build shell</text>
+</g>
+<g>
+<circle cx="624" cy="506" r="9.5" fill="#7A4FB5" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="624" y="510" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">2</text>
+<text x="642" y="510" font-size="11.5" font-weight="700" fill="#333">Shell app · bootstrapApplication → @eduhub/* path alias (tsconfig)</text>
+<text x="642" y="526" font-size="11.5" fill="#E67E22">import @eduhub/* qua path alias</text>
+</g>
+</svg>

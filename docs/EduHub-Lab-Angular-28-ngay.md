@@ -39,13 +39,13 @@ eduhub/
 
 Phần tổng quan có 2 hình, mỗi hình trả lời một câu hỏi. Hình **runtime** cho biết khi app chạy thì ai gọi ai: shell nạp 2 remote qua manifest, catalog là app SSR riêng, mọi HTTP và WebSocket đi vào MSW. Mũi tên vẽ ở mức khối chức năng; chi tiết từng file nằm trong hình của từng ngày.
 
-&#91;image: Kiến trúc runtime EduHub\]
+[![Kiến trúc runtime EduHub](images/eduhub-00-overall.svg)](images/eduhub-00-overall.svg)
 
 ### Test & CI
 
 Hình thứ hai nối mỗi công cụ test với phần nó kiểm tra. Đây là kim tự tháp test của dự án dưới dạng sơ đồ, dùng để ôn trước phỏng vấn.
 
-&#91;image: Test & CI EduHub\]
+[![Test & CI EduHub](images/eduhub-00-test-ci.svg)](images/eduhub-00-test-ci.svg)
 
 Hình của từng ngày dùng chung một bố cục chi tiết. Khối viền cam là khối thêm trong ngày, nhãn "CẬP NHẬT" và chữ cam là phần mới của khối cũ, còn khối và mũi tên mờ là những thứ đã có từ trước và không đổi trong ngày. Bấm vào hình để xem rõ chữ.
 
@@ -58,7 +58,7 @@ Hình của từng ngày dùng chung một bố cục chi tiết. Khối viền 
 
 ### Ngày 0 – Chuẩn bị (Chủ nhật 25/10, 30 phút)
 
-&#91;image: Kiến trúc Ngày 0\]
+[![Kiến trúc Ngày 0](images/eduhub-day00.svg)](images/eduhub-day00.svg)
 
 **Mục tiêu:** máy sẵn sàng, workspace rỗng, có script `verify`.
 
@@ -90,7 +90,7 @@ Cuối tuần: shell chạy hoàn toàn trên MSW, đổi tenant thì theme và 
 
 ### Ngày 1 – Dựng workspace và shell (Thứ Hai 26/10)
 
-&#91;image: Kiến trúc Ngày 1\]
+[![Kiến trúc Ngày 1](images/eduhub-day01.svg)](images/eduhub-day01.svg)
 
 **Mục tiêu:** có app `shell` và 7 lib rỗng, import được lib bằng alias.
 
@@ -114,7 +114,7 @@ ng serve shell
 
 ### Ngày 2 – MSW: DB giả và handler đầu tiên (Thứ Ba 27/10)
 
-&#91;image: Kiến trúc Ngày 2\]
+[![Kiến trúc Ngày 2](images/eduhub-day02.svg)](images/eduhub-day02.svg)
 
 **Mục tiêu:** shell gọi `/api/courses` và nhận dữ liệu từ MSW, có 2 tenant `alpha` và `beta`.
 
@@ -138,7 +138,7 @@ ng serve shell   # DevTools > Console thấy "[MSW] Mocking enabled"
 
 ### Ngày 3 – Khung test: Vitest + MSW + Testing Library (Thứ Tư 28/10)
 
-&#91;image: Kiến trúc Ngày 3\]
+[![Kiến trúc Ngày 3](images/eduhub-day03.svg)](images/eduhub-day03.svg)
 
 **Mục tiêu:** chạy được test component có HTTP thật đi qua MSW `setupServer`.
 
@@ -160,7 +160,7 @@ ng test mocks --no-watch
 
 ### Ngày 4 – Signals cốt lõi + TenantService (Thứ Năm 29/10)
 
-&#91;image: Kiến trúc Ngày 4\]
+[![Kiến trúc Ngày 4](images/eduhub-day04.svg)](images/eduhub-day04.svg)
 
 **Mục tiêu:** `TenantService` giữ tenant bằng `signal`, theme áp dụng qua `effect`.
 
@@ -183,7 +183,7 @@ ng test tenant --no-watch
 
 ### Ngày 5 – DI chuyên sâu (Thứ Sáu 30/10)
 
-&#91;image: Kiến trúc Ngày 5\]
+[![Kiến trúc Ngày 5](images/eduhub-day05.svg)](images/eduhub-day05.svg)
 
 **Mục tiêu:** hiểu và chứng minh được injector nào resolve provider nào.
 
@@ -203,7 +203,7 @@ ng test tenant --no-watch
 
 ### Ngày 6 – Router functional: interceptor, guard, resolver (Thứ Bảy 31/10, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 6\]
+[![Kiến trúc Ngày 6](images/eduhub-day06.svg)](images/eduhub-day06.svg)
 
 **Mục tiêu:** routing lazy, interceptor gắn tenant/token, refresh token khi 401, guard theo role.
 
@@ -228,7 +228,7 @@ ng test auth --no-watch
 
 ### Ngày 7 – UI lib, CI, tổng kết tuần (Chủ nhật 1/11, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 7\]
+[![Kiến trúc Ngày 7](images/eduhub-day07.svg)](images/eduhub-day07.svg)
 
 **Mục tiêu:** `DataTable`, `Modal`, `FormField` có test, CI chạy trên GitHub Actions.
 
@@ -259,7 +259,7 @@ Từ tuần này đến hết Tuần 3, feature đặt trong `projects/shell/src
 
 ### Ngày 8 – Ôn flattening operators bằng marble (Thứ Hai 2/11)
 
-&#91;image: Kiến trúc Ngày 8\]
+[![Kiến trúc Ngày 8](images/eduhub-day08.svg)](images/eduhub-day08.svg)
 
 **Mục tiêu:** tự giải thích được khác biệt `switchMap`, `mergeMap`, `concatMap`, `exhaustMap` bằng 4 marble test.
 
@@ -280,7 +280,7 @@ ng test util --no-watch
 
 ### Ngày 9 – Typeahead tìm khóa học (Thứ Ba 3/11)
 
-&#91;image: Kiến trúc Ngày 9\]
+[![Kiến trúc Ngày 9](images/eduhub-day09.svg)](images/eduhub-day09.svg)
 
 **Mục tiêu:** ô tìm kiếm có `debounceTime` → `distinctUntilChanged` → `switchMap`, đủ 4 trạng thái loading/error/empty/data.
 
@@ -301,7 +301,7 @@ ng test data-access --no-watch
 
 ### Ngày 10 – Nộp bài và upload (Thứ Tư 4/11)
 
-&#91;image: Kiến trúc Ngày 10\]
+[![Kiến trúc Ngày 10](images/eduhub-day10.svg)](images/eduhub-day10.svg)
 
 **Mục tiêu:** nộp bài chống double-submit bằng `exhaustMap`, upload nhiều file song song tối đa 3.
 
@@ -323,7 +323,7 @@ ng test --no-watch
 
 ### Ngày 11 – Interop Signals ↔ RxJS (Thứ Năm 5/11)
 
-&#91;image: Kiến trúc Ngày 11\]
+[![Kiến trúc Ngày 11](images/eduhub-day11.svg)](images/eduhub-day11.svg)
 
 **Mục tiêu:** làm cùng một màn danh sách lớp học theo 2 cách và viết được khi nào chọn cách nào.
 
@@ -344,7 +344,7 @@ ng test data-access --no-watch
 
 ### Ngày 12 – Gradebook SignalStore (Thứ Sáu 6/11)
 
-&#91;image: Kiến trúc Ngày 12\]
+[![Kiến trúc Ngày 12](images/eduhub-day12.svg)](images/eduhub-day12.svg)
 
 **Mục tiêu:** store điểm có `withState`, `withComputed`, `withMethods`, optimistic update và rollback.
 
@@ -365,7 +365,7 @@ ng test data-access --no-watch --coverage
 
 ### Ngày 13 – SignalR mock bằng MSW (Thứ Bảy 7/11, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 13\]
+[![Kiến trúc Ngày 13](images/eduhub-day13.svg)](images/eduhub-day13.svg)
 
 **Mục tiêu:** `@microsoft/signalr` kết nối được tới hub giả trong MSW, đi qua cả negotiate và handshake.
 
@@ -390,7 +390,7 @@ ng serve shell   # DevTools > Network > WS: thấy frame handshake và ping
 
 ### Ngày 14 – Realtime vào store, reconnect, tổng kết (Chủ nhật 8/11, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 14\]
+[![Kiến trúc Ngày 14](images/eduhub-day14.svg)](images/eduhub-day14.svg)
 
 **Mục tiêu:** điểm cập nhật realtime trong UI, đứt kết nối thì tự nối lại với exponential backoff.
 
@@ -416,7 +416,7 @@ Cuối tuần: catalog SSR trả HTML có nội dung thật, không double-fetch
 
 ### Ngày 15 – App catalog SSR + MSW phía server (Thứ Hai 9/11)
 
-&#91;image: Kiến trúc Ngày 15\]
+[![Kiến trúc Ngày 15](images/eduhub-day15.svg)](images/eduhub-day15.svg)
 
 **Mục tiêu:** `mfe-catalog` chạy SSR, render danh sách khóa học từ MSW ngay trên server.
 
@@ -441,7 +441,7 @@ curl -s http://localhost:4000/courses | grep -c "course-card"
 
 ### Ngày 16 – Transfer cache, chống double-fetch (Thứ Ba 10/11)
 
-&#91;image: Kiến trúc Ngày 16\]
+[![Kiến trúc Ngày 16](images/eduhub-day16.svg)](images/eduhub-day16.svg)
 
 **Mục tiêu:** trang SSR chỉ gọi API **một lần**, client hydrate xong không gọi lại.
 
@@ -463,7 +463,7 @@ npx playwright test e2e/catalog
 
 ### Ngày 17 – SEO, meta, ảnh (Thứ Tư 11/11)
 
-&#91;image: Kiến trúc Ngày 17\]
+[![Kiến trúc Ngày 17](images/eduhub-day17.svg)](images/eduhub-day17.svg)
 
 **Mục tiêu:** trang chi tiết khóa học có `<title>`, meta description, OG tag, canonical và JSON-LD `Course` động.
 
@@ -484,7 +484,7 @@ curl -s http://localhost:4000/courses/angular-signals | grep -E "<title>|og:titl
 
 ### Ngày 18 – Hydration và `@defer` (Thứ Năm 12/11)
 
-&#91;image: Kiến trúc Ngày 18\]
+[![Kiến trúc Ngày 18](images/eduhub-day18.svg)](images/eduhub-day18.svg)
 
 **Mục tiêu:** dùng incremental hydration cho phần review và khóa học liên quan, không còn lỗi hydration mismatch.
 
@@ -504,7 +504,7 @@ npx playwright test e2e/catalog/defer.spec.ts
 
 ### Ngày 19 – Typed reactive forms (Thứ Sáu 13/11)
 
-&#91;image: Kiến trúc Ngày 19\]
+[![Kiến trúc Ngày 19](images/eduhub-day19.svg)](images/eduhub-day19.svg)
 
 **Mục tiêu:** form tạo bài kiểm tra có `FormArray` câu hỏi động, validator chéo và async validator.
 
@@ -526,7 +526,7 @@ ng test shell --no-watch
 
 ### Ngày 20 – ControlValueAccessor và a11y (Thứ Bảy 14/11, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 20\]
+[![Kiến trúc Ngày 20](images/eduhub-day20.svg)](images/eduhub-day20.svg)
 
 **Mục tiêu:** một control `Rating` (hoặc rich-text) dùng được với `formControl` lẫn `ngModel`, không lỗi a11y nghiêm trọng.
 
@@ -549,7 +549,7 @@ npx playwright test e2e/a11y
 
 ### Ngày 21 – Performance và tổng kết (Chủ nhật 15/11, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 21\]
+[![Kiến trúc Ngày 21](images/eduhub-day21.svg)](images/eduhub-day21.svg)
 
 **Mục tiêu:** có số liệu trước/sau tối ưu cho catalog và shell.
 
@@ -577,7 +577,7 @@ Cuối tuần: shell + 3 remote deploy độc lập, capstone "Live Gradebook & 
 
 ### Ngày 22 – Native Federation: shell và 2 remote (Thứ Hai 16/11)
 
-&#91;image: Kiến trúc Ngày 22\]
+[![Kiến trúc Ngày 22](images/eduhub-day22.svg)](images/eduhub-day22.svg)
 
 **Mục tiêu:** shell là dynamic host, `mfe-learning` và `mfe-admin` là remote, load qua manifest.
 
@@ -607,7 +607,7 @@ ng serve shell
 
 ### Ngày 23 – Shared dependencies và state dùng chung (Thứ Ba 17/11)
 
-&#91;image: Kiến trúc Ngày 23\]
+[![Kiến trúc Ngày 23](images/eduhub-day23.svg)](images/eduhub-day23.svg)
 
 **Mục tiêu:** Angular, RxJS, `@eduhub/auth`, `@eduhub/tenant` chỉ tải **một lần**; đổi tenant ở shell thì remote cập nhật.
 
@@ -629,7 +629,7 @@ ng build shell && ng build mfe-learning
 
 ### Ngày 24 – Cô lập lỗi và deploy độc lập (Thứ Tư 18/11)
 
-&#91;image: Kiến trúc Ngày 24\]
+[![Kiến trúc Ngày 24](images/eduhub-day24.svg)](images/eduhub-day24.svg)
 
 **Mục tiêu:** một remote chết thì shell hiện fallback; đổi version remote chỉ bằng cách sửa manifest.
 
@@ -656,7 +656,7 @@ Nếu `mfe-catalog` (SSR) gây xung đột khi gắn Native Federation, giữ n�
 
 ### Ngày 25 – Capstone 1: luồng realtime xuyên MFE (Thứ Năm 19/11)
 
-&#91;image: Kiến trúc Ngày 25\]
+[![Kiến trúc Ngày 25](images/eduhub-day25.svg)](images/eduhub-day25.svg)
 
 **Mục tiêu:** giáo viên sửa điểm trong `mfe-admin`, học sinh thấy điểm mới trong `mfe-learning` mà không reload.
 
@@ -676,7 +676,7 @@ npm run start:all   # script chạy song song shell + 3 remote (dùng concurrent
 
 ### Ngày 26 – Capstone 2: E2E luồng chính và luồng lỗi (Thứ Sáu 20/11)
 
-&#91;image: Kiến trúc Ngày 26\]
+[![Kiến trúc Ngày 26](images/eduhub-day26.svg)](images/eduhub-day26.svg)
 
 **Mục tiêu:** E2E chứng minh luồng realtime và hai kịch bản lỗi.
 
@@ -697,7 +697,7 @@ npx playwright show-report
 
 ### Ngày 27 – Capstone 3: chất lượng (Thứ Bảy 21/11, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 27\]
+[![Kiến trúc Ngày 27](images/eduhub-day27.svg)](images/eduhub-day27.svg)
 
 **Mục tiêu:** đạt toàn bộ ngưỡng chất lượng bắt buộc.
 
@@ -720,7 +720,7 @@ npm run verify
 
 ### Ngày 28 – Tài liệu, tự chấm, demo (Chủ nhật 22/11, 3–4 giờ)
 
-&#91;image: Kiến trúc Ngày 28\]
+[![Kiến trúc Ngày 28](images/eduhub-day28.svg)](images/eduhub-day28.svg)
 
 **Mục tiêu:** README đủ để người khác clone và chạy trong 5 phút, và bạn tự trình bày được kiến trúc trong 10 phút.
 

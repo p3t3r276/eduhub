@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1614" height="1364" viewBox="0 0 1614 1364" font-family="'Segoe UI', Arial, sans-serif" font-size="12">
+<title>EduHub · Kiến trúc runtime (sau Ngày 28)</title>
+<defs>
+<marker id="a-http" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C0392B"/></marker>
+<marker id="a-ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2F6DB5"/></marker>
+<marker id="a-di" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7A4FB5"/></marker>
+<marker id="a-push" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#D35400"/></marker>
+<marker id="a-local" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#777777"/></marker>
+</defs>
+<rect x="0" y="0" width="1614" height="1364" fill="#FCFAF4"/>
+<text x="40" y="42" font-size="22" font-weight="700" fill="#222">EduHub · Kiến trúc runtime (sau Ngày 28)</text>
+<text x="40" y="64" font-size="13" fill="#555">Shell nạp 2 remote qua manifest; catalog là app SSR riêng. Mọi HTTP và WebSocket đi vào MSW, Node dùng setupServer với cùng bộ handler. Quan hệ vẽ ở mức khối chức năng, chi tiết từng ngày xem hình theo ngày.</text>
+<rect x="1229" y="158" width="345" height="432" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#D35400" stroke-width="1.6"/>
+<rect x="427" y="668" width="746" height="102" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#2E8B57" stroke-width="1.6"/>
+<rect x="26" y="668" width="345" height="102" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#6B6B6B" stroke-width="1.6"/>
+<rect x="12" y="128" width="1175" height="491" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#5B7DB1" stroke-width="1.6"/>
+<rect x="26" y="158" width="345" height="337" rx="10" fill="#FFFFFF" fill-opacity="0.0" stroke="#138D90" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="427" y="268" width="345" height="212" rx="10" fill="#FFFFFF" fill-opacity="0.0" stroke="#138D90" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="828" y="158" width="345" height="447" rx="10" fill="#FFFFFF" fill-opacity="0.0" stroke="#2F6DB5" stroke-width="1.2" stroke-dasharray="5 4"/>
+<g>
+<rect x="40" y="190" width="317" height="69" rx="8" fill="#DDF2F1" stroke="#138D90" stroke-width="1.4"/>
+<text x="52" y="211" font-size="12.5" font-weight="700" fill="#222">Shell · bootstrapApplication</text>
+<text x="52" y="230" font-size="11" fill="#555">zoneless · standalone · router lazy</text>
+<text x="52" y="245" font-size="11" fill="#555">theme / locale / flag theo tenant</text>
+</g>
+<g>
+<rect x="40" y="315" width="317" height="54" rx="8" fill="#DDF2F1" stroke="#138D90" stroke-width="1.4"/>
+<text x="52" y="336" font-size="12.5" font-weight="700" fill="#222">loadRemoteModule + manifest.json</text>
+<text x="52" y="355" font-size="11" fill="#555">manifest đọc lúc chạy, không build lại shell</text>
+</g>
+<g>
+<rect x="40" y="425" width="317" height="54" rx="8" fill="#DDF2F1" stroke="#138D90" stroke-width="1.4"/>
+<text x="52" y="446" font-size="12.5" font-weight="700" fill="#222">Fallback route + timeout</text>
+<text x="52" y="465" font-size="11" fill="#555">remote chết / treo → shell vẫn chạy</text>
+</g>
+<g>
+<rect x="441" y="300" width="317" height="54" rx="8" fill="#DDF2F1" stroke="#138D90" stroke-width="1.4"/>
+<text x="453" y="321" font-size="12.5" font-weight="700" fill="#222">mfe-learning · :4201</text>
+<text x="453" y="340" font-size="11" fill="#555">nộp bài, upload · điểm realtime</text>
+</g>
+<g>
+<rect x="441" y="410" width="317" height="54" rx="8" fill="#DDF2F1" stroke="#138D90" stroke-width="1.4"/>
+<text x="453" y="431" font-size="12.5" font-weight="700" fill="#222">mfe-admin · :4202</text>
+<text x="453" y="450" font-size="11" fill="#555">Gradebook · QuizEditor (forms, CVA)</text>
+</g>
+<g>
+<rect x="842" y="190" width="317" height="69" rx="8" fill="#E3EEFA" stroke="#2F6DB5" stroke-width="1.4"/>
+<text x="854" y="211" font-size="12.5" font-weight="700" fill="#222">tenant + auth</text>
+<text x="854" y="230" font-size="11" fill="#555">TenantService (signal), TENANT_CONFIG</text>
+<text x="854" y="245" font-size="11" fill="#555">interceptor X-Tenant-Id, refresh single-flight</text>
+</g>
+<g>
+<rect x="842" y="315" width="317" height="54" rx="8" fill="#E3EEFA" stroke="#2F6DB5" stroke-width="1.4"/>
+<text x="854" y="336" font-size="12.5" font-weight="700" fill="#222">ui · util</text>
+<text x="854" y="355" font-size="11" fill="#555">DataTable, Modal, Rating (CVA) · rx helpers</text>
+</g>
+<g>
+<rect x="842" y="425" width="317" height="54" rx="8" fill="#F1E6FA" stroke="#8E44AD" stroke-width="1.4"/>
+<text x="854" y="446" font-size="12.5" font-weight="700" fill="#222">GradebookStore (SignalStore)</text>
+<text x="854" y="465" font-size="11" fill="#555">optimistic update + rollback</text>
+</g>
+<g>
+<rect x="842" y="535" width="317" height="54" rx="8" fill="#F1E6FA" stroke="#8E44AD" stroke-width="1.4"/>
+<text x="854" y="556" font-size="12.5" font-weight="700" fill="#222">RealtimeClient → SignalR</text>
+<text x="854" y="575" font-size="11" fill="#555">retry backoff · tải lại snapshot</text>
+</g>
+<g>
+<rect x="1243" y="190" width="317" height="54" rx="8" fill="#FDEBD8" stroke="#D35400" stroke-width="1.4"/>
+<text x="1255" y="211" font-size="12.5" font-weight="700" fill="#222">browser.ts · setupWorker</text>
+<text x="1255" y="230" font-size="11" fill="#555">Service Worker chặn /api/*</text>
+</g>
+<g>
+<rect x="1243" y="300" width="317" height="54" rx="8" fill="#FDEBD8" stroke="#D35400" stroke-width="1.4"/>
+<text x="1255" y="321" font-size="12.5" font-weight="700" fill="#222">handlers/ REST + db/</text>
+<text x="1255" y="340" font-size="11" fill="#555">@mswjs/data theo tenant · scenarios slow/flaky</text>
+</g>
+<g>
+<rect x="1243" y="410" width="317" height="54" rx="8" fill="#FDEBD8" stroke="#D35400" stroke-width="1.4"/>
+<text x="1255" y="431" font-size="12.5" font-weight="700" fill="#222">signalr.ts · hub giả</text>
+<text x="1255" y="450" font-size="11" fill="#555">negotiate + ws.link · pushEvent</text>
+</g>
+<g>
+<rect x="1243" y="520" width="317" height="54" rx="8" fill="#FDEBD8" stroke="#D35400" stroke-width="1.4"/>
+<text x="1255" y="541" font-size="12.5" font-weight="700" fill="#222">server.ts · setupServer (Node)</text>
+<text x="1255" y="560" font-size="11" fill="#555">dùng trong SSR dev và Vitest</text>
+</g>
+<g>
+<rect x="842" y="700" width="317" height="54" rx="8" fill="#DFF1E6" stroke="#2E8B57" stroke-width="1.4"/>
+<text x="854" y="721" font-size="12.5" font-weight="700" fill="#222">server.mjs · Node SSR</text>
+<text x="854" y="740" font-size="11" fill="#555">render mode theo route · TransferState</text>
+</g>
+<g>
+<rect x="441" y="700" width="317" height="54" rx="8" fill="#DFF1E6" stroke="#2E8B57" stroke-width="1.4"/>
+<text x="453" y="721" font-size="12.5" font-weight="700" fill="#222">Catalog pages (hydrate)</text>
+<text x="453" y="740" font-size="11" fill="#555">SEO + JSON-LD · @defer hydrate on viewport</text>
+</g>
+<g>
+<rect x="40" y="700" width="317" height="54" rx="8" fill="#FFFFFF" stroke="#6B6B6B" stroke-width="1.4"/>
+<text x="52" y="721" font-size="12.5" font-weight="700" fill="#222">learning-v1 :5001 · v2 :5002</text>
+<text x="52" y="740" font-size="11" fill="#555">npx serve dist/releases/*</text>
+</g>
+<path d="M198.5,259.0 C198.5,289.0 198.5,285.0 198.5,315.0" fill="none" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<path d="M357.0,334.5 C397.0,334.5 401.0,327.0 441.0,327.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path d="M357.0,342.0 C397.0,342.0 401.0,437.0 441.0,437.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path d="M198.5,369.0 C198.5,399.0 198.5,395.0 198.5,425.0" fill="none" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<path d="M357.0,349.5 C477.0,349.5 477.0,727.0 357.0,727.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path d="M357.0,224.5 C517.0,224.5 682.0,224.5 842.0,224.5" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path d="M758.0,437.0 C798.0,437.0 802.0,452.0 842.0,452.0" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path d="M758.0,327.0 C798.0,327.0 802.0,562.0 842.0,562.0" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path d="M1159.0,224.5 C1199.0,224.5 1203.0,217.0 1243.0,217.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path d="M1159.0,452.0 C1199.0,452.0 1203.0,327.0 1243.0,327.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path d="M1159.0,557.0 C1199.0,557.0 1203.0,432.0 1243.0,432.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path d="M1355.3,354.0 C1355.3,384.0 1401.5,380.0 1401.5,410.0" fill="none" stroke="#D35400" stroke-width="2" marker-end="url(#a-push)"/>
+<path d="M1243.0,442.0 C1203.0,442.0 1199.0,567.0 1159.0,567.0" fill="none" stroke="#D35400" stroke-width="2" marker-end="url(#a-push)"/>
+<path d="M1000.5,535.0 C1000.5,505.0 1000.5,509.0 1000.5,479.0" fill="none" stroke="#D35400" stroke-width="2" marker-end="url(#a-push)"/>
+<path d="M1401.5,244.0 C1401.5,274.0 1401.5,270.0 1401.5,300.0" fill="none" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<path d="M842.0,727.0 C802.0,727.0 798.0,727.0 758.0,727.0" fill="none" stroke="#D35400" stroke-width="2" marker-end="url(#a-push)"/>
+<path d="M1159.0,727.0 C1199.0,727.0 1203.0,547.0 1243.0,547.0" fill="none" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<path d="M1401.5,520.0 C1401.5,445.3 1447.7,428.7 1447.7,354.0" fill="none" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<g>
+<circle cx="198.5" cy="287.0" r="10.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.6"/>
+<text x="198.5" y="291.0" text-anchor="middle" font-size="11" font-weight="700" fill="#777777">1</text>
+</g>
+<g>
+<circle cx="399.0" cy="330.8" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="399.0" y="334.8" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">2</text>
+</g>
+<g>
+<circle cx="399.0" cy="389.5" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="399.0" y="393.5" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">3</text>
+</g>
+<g>
+<circle cx="198.5" cy="397.0" r="10.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.6"/>
+<text x="198.5" y="401.0" text-anchor="middle" font-size="11" font-weight="700" fill="#777777">4</text>
+</g>
+<g>
+<circle cx="447.0" cy="538.2" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="447.0" y="542.2" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">5</text>
+</g>
+<g>
+<circle cx="599.5" cy="224.5" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="599.5" y="228.5" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">6</text>
+</g>
+<g>
+<circle cx="800.0" cy="444.5" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="800.0" y="448.5" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">7</text>
+</g>
+<g>
+<circle cx="794.7" cy="416.5" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="794.7" y="420.5" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">8</text>
+</g>
+<g>
+<circle cx="1201.0" cy="220.8" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="1201.0" y="224.8" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">9</text>
+</g>
+<g>
+<circle cx="1201.0" cy="389.5" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="1201.0" y="393.5" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">10</text>
+</g>
+<g>
+<circle cx="1201.0" cy="494.5" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="1201.0" y="498.5" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">11</text>
+</g>
+<g>
+<circle cx="1378.4" cy="382.0" r="10.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.6"/>
+<text x="1378.4" y="386.0" text-anchor="middle" font-size="11" font-weight="700" fill="#D35400">12</text>
+</g>
+<g>
+<circle cx="1195.7" cy="519.4" r="10.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.6"/>
+<text x="1195.7" y="523.4" text-anchor="middle" font-size="11" font-weight="700" fill="#D35400">13</text>
+</g>
+<g>
+<circle cx="1000.5" cy="507.0" r="10.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.6"/>
+<text x="1000.5" y="511.0" text-anchor="middle" font-size="11" font-weight="700" fill="#D35400">14</text>
+</g>
+<g>
+<circle cx="1401.5" cy="272.0" r="10.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.6"/>
+<text x="1401.5" y="276.0" text-anchor="middle" font-size="11" font-weight="700" fill="#777777">15</text>
+</g>
+<g>
+<circle cx="800.0" cy="727.0" r="10.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.6"/>
+<text x="800.0" y="731.0" text-anchor="middle" font-size="11" font-weight="700" fill="#D35400">16</text>
+</g>
+<g>
+<circle cx="1201.0" cy="637.0" r="10.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.6"/>
+<text x="1201.0" y="641.0" text-anchor="middle" font-size="11" font-weight="700" fill="#777777">17</text>
+</g>
+<g>
+<circle cx="1409.2" cy="471.5" r="10.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.6"/>
+<text x="1409.2" y="475.5" text-anchor="middle" font-size="11" font-weight="700" fill="#777777">18</text>
+</g>
+<rect x="1237" y="164" width="126" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="1243" y="178" font-size="12.5" font-weight="700" fill="#333">libs/mocks · MSW</text>
+<rect x="435" y="674" width="175" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="441" y="688" font-size="12.5" font-weight="700" fill="#333">mfe-catalog · SSR :4000</text>
+<rect x="34" y="674" width="210" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="40" y="688" font-size="12.5" font-weight="700" fill="#333">Static host · deploy độc lập</text>
+<rect x="20" y="134" width="196" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="26" y="148" font-size="12.5" font-weight="700" fill="#333">Trình duyệt · origin :4200</text>
+<rect x="34" y="164" width="189" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="40" y="178" font-size="12.5" font-weight="700" fill="#333">apps/shell · dynamic host</text>
+<rect x="435" y="274" width="196" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="441" y="288" font-size="12.5" font-weight="700" fill="#333">Remote (Native Federation)</text>
+<rect x="836" y="164" width="266" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="842" y="178" font-size="12.5" font-weight="700" fill="#333">libs/ · shared singleton (tải 1 lần)</text>
+<line x1="40" y1="820" x2="80" y2="820" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<text x="90" y="824" font-size="11.5" fill="#333">Data plane: HTTP / WebSocket tới API (do MSW trả lời)</text>
+<line x1="551" y1="820" x2="591" y2="820" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<text x="601" y="824" font-size="11.5" fill="#333">DI / import / đọc signal giữa các khối code</text>
+<line x1="1063" y1="820" x2="1103" y2="820" stroke="#D35400" stroke-width="2" marker-end="url(#a-push)"/>
+<text x="1113" y="824" font-size="11.5" fill="#333">Push: event realtime, effect, HTML render, state</text>
+<line x1="40" y1="844" x2="80" y2="844" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<text x="90" y="848" font-size="11.5" fill="#333">Nội bộ trong cùng runtime / chuyển tiếp</text>
+<text x="40" y="890" font-size="14" font-weight="700" fill="#222">Quan hệ giữa các thành phần (số trên mũi tên)</text>
+<g>
+<circle cx="50" cy="916" r="9.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.5"/>
+<text x="50" y="920" text-anchor="middle" font-size="10.5" font-weight="700" fill="#777777">1</text>
+<text x="68" y="920" font-size="11.5" font-weight="700" fill="#333">Shell · bootstrapApplication → loadRemoteModule + manifest.json</text>
+<text x="68" y="936" font-size="11.5" fill="#333">route /learning, /admin → loadChildren</text>
+</g>
+<g>
+<circle cx="50" cy="962" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="50" y="966" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">2</text>
+<text x="68" y="966" font-size="11.5" font-weight="700" fill="#333">loadRemoteModule + manifest.json → mfe-learning · :4201</text>
+<text x="68" y="982" font-size="11.5" fill="#333">tải remoteEntry.json + ./routes</text>
+</g>
+<g>
+<circle cx="50" cy="1008" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="50" y="1012" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">3</text>
+<text x="68" y="1012" font-size="11.5" font-weight="700" fill="#333">loadRemoteModule + manifest.json → mfe-admin · :4202</text>
+<text x="68" y="1028" font-size="11.5" fill="#333">tải remoteEntry.json + ./routes</text>
+</g>
+<g>
+<circle cx="50" cy="1054" r="9.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.5"/>
+<text x="50" y="1058" text-anchor="middle" font-size="10.5" font-weight="700" fill="#777777">4</text>
+<text x="68" y="1058" font-size="11.5" font-weight="700" fill="#333">loadRemoteModule + manifest.json → Fallback route + timeout</text>
+<text x="68" y="1074" font-size="11.5" fill="#333">remote lỗi hoặc timeout</text>
+</g>
+<g>
+<circle cx="50" cy="1100" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="50" y="1104" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">5</text>
+<text x="68" y="1104" font-size="11.5" font-weight="700" fill="#333">loadRemoteModule + manifest.json → learning-v1 :5001 · v2 :5002</text>
+<text x="68" y="1120" font-size="11.5" fill="#333">manifest trỏ learning → v2, không build lại shell</text>
+</g>
+<g>
+<circle cx="50" cy="1146" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="50" y="1150" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">6</text>
+<text x="68" y="1150" font-size="11.5" font-weight="700" fill="#333">Shell · bootstrapApplication → tenant + auth</text>
+<text x="68" y="1166" font-size="11.5" fill="#333">interceptor, guard, theme theo tenant</text>
+</g>
+<g>
+<circle cx="50" cy="1192" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="50" y="1196" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">7</text>
+<text x="68" y="1196" font-size="11.5" font-weight="700" fill="#333">mfe-admin · :4202 → GradebookStore (SignalStore)</text>
+<text x="68" y="1212" font-size="11.5" fill="#333">giáo viên sửa điểm</text>
+</g>
+<g>
+<circle cx="50" cy="1238" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="50" y="1242" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">8</text>
+<text x="68" y="1242" font-size="11.5" font-weight="700" fill="#333">mfe-learning · :4201 → RealtimeClient → SignalR</text>
+<text x="68" y="1258" font-size="11.5" fill="#333">học sinh nghe gradeUpdated</text>
+</g>
+<g>
+<circle cx="50" cy="1284" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="50" y="1288" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">9</text>
+<text x="68" y="1288" font-size="11.5" font-weight="700" fill="#333">tenant + auth → browser.ts · setupWorker</text>
+<text x="68" y="1304" font-size="11.5" fill="#333">mọi /api/* (X-Tenant-Id, Bearer token)</text>
+</g>
+<g>
+<circle cx="817" cy="916" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="817" y="920" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">10</text>
+<text x="835" y="920" font-size="11.5" font-weight="700" fill="#333">GradebookStore (SignalStore) → handlers/ REST + db/</text>
+<text x="835" y="936" font-size="11.5" fill="#333">PATCH /grades/:id</text>
+</g>
+<g>
+<circle cx="817" cy="962" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="817" y="966" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">11</text>
+<text x="835" y="966" font-size="11.5" font-weight="700" fill="#333">RealtimeClient → SignalR → signalr.ts · hub giả</text>
+<text x="835" y="982" font-size="11.5" fill="#333">negotiate + WebSocket /hubs/grades</text>
+</g>
+<g>
+<circle cx="817" cy="1008" r="9.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.5"/>
+<text x="817" y="1012" text-anchor="middle" font-size="10.5" font-weight="700" fill="#D35400">12</text>
+<text x="835" y="1012" font-size="11.5" font-weight="700" fill="#333">handlers/ REST + db/ → signalr.ts · hub giả</text>
+<text x="835" y="1028" font-size="11.5" fill="#333">PATCH thành công → broadcast</text>
+</g>
+<g>
+<circle cx="817" cy="1054" r="9.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.5"/>
+<text x="817" y="1058" text-anchor="middle" font-size="10.5" font-weight="700" fill="#D35400">13</text>
+<text x="835" y="1058" font-size="11.5" font-weight="700" fill="#333">signalr.ts · hub giả → RealtimeClient → SignalR</text>
+<text x="835" y="1074" font-size="11.5" fill="#333">gradeUpdated</text>
+</g>
+<g>
+<circle cx="817" cy="1100" r="9.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.5"/>
+<text x="817" y="1104" text-anchor="middle" font-size="10.5" font-weight="700" fill="#D35400">14</text>
+<text x="835" y="1104" font-size="11.5" font-weight="700" fill="#333">RealtimeClient → SignalR → GradebookStore (SignalStore)</text>
+<text x="835" y="1120" font-size="11.5" fill="#333">patchState, nối lại → tải snapshot</text>
+</g>
+<g>
+<circle cx="817" cy="1146" r="9.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.5"/>
+<text x="817" y="1150" text-anchor="middle" font-size="10.5" font-weight="700" fill="#777777">15</text>
+<text x="835" y="1150" font-size="11.5" font-weight="700" fill="#333">browser.ts · setupWorker → handlers/ REST + db/</text>
+<text x="835" y="1166" font-size="11.5" fill="#333">chuyển request tới handler</text>
+</g>
+<g>
+<circle cx="817" cy="1192" r="9.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.5"/>
+<text x="817" y="1196" text-anchor="middle" font-size="10.5" font-weight="700" fill="#D35400">16</text>
+<text x="835" y="1196" font-size="11.5" font-weight="700" fill="#333">server.mjs · Node SSR → Catalog pages (hydrate)</text>
+<text x="835" y="1212" font-size="11.5" fill="#333">HTML có dữ liệu + TransferState</text>
+</g>
+<g>
+<circle cx="817" cy="1238" r="9.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.5"/>
+<text x="817" y="1242" text-anchor="middle" font-size="10.5" font-weight="700" fill="#777777">17</text>
+<text x="835" y="1242" font-size="11.5" font-weight="700" fill="#333">server.mjs · Node SSR → server.ts · setupServer (Node)</text>
+<text x="835" y="1258" font-size="11.5" fill="#333">GET /api/courses trên server</text>
+</g>
+<g>
+<circle cx="817" cy="1284" r="9.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.5"/>
+<text x="817" y="1288" text-anchor="middle" font-size="10.5" font-weight="700" fill="#777777">18</text>
+<text x="835" y="1288" font-size="11.5" font-weight="700" fill="#333">server.ts · setupServer (Node) → handlers/ REST + db/</text>
+<text x="835" y="1304" font-size="11.5" fill="#333">cùng bộ handler</text>
+</g>
+</svg>

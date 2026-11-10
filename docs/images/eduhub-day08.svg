@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1646" height="1743" viewBox="0 0 1646 1743" font-family="'Segoe UI', Arial, sans-serif" font-size="12">
+<title>Ngày 8 · Flattening operators bằng marble</title>
+<defs>
+<marker id="a-http" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C0392B"/></marker>
+<marker id="a-ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2F6DB5"/></marker>
+<marker id="a-di" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7A4FB5"/></marker>
+<marker id="a-push" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#D35400"/></marker>
+<marker id="a-local" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#777777"/></marker>
+</defs>
+<rect x="0" y="0" width="1646" height="1743" fill="#FCFAF4"/>
+<text x="40" y="42" font-size="22" font-weight="700" fill="#222">Ngày 8 · Flattening operators bằng marble</text>
+<text x="40" y="64" font-size="13" fill="#555">Marble test bằng TestScheduler cho helper RxJS.</text>
+<rect x="40" y="100" width="12" height="12" rx="2" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="60" y="110" font-size="12" fill="#333">Mới: 2 khối · cập nhật: 0 khối · quan hệ mới: 1 · khối và mũi tên mờ: đã có từ trước, không đổi trong ngày</text>
+<rect x="26" y="128" width="345" height="1067" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#6B6B6B" stroke-width="1.6"/>
+<rect x="1229" y="128" width="377" height="767" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#D35400" stroke-width="1.6"/>
+<rect x="413" y="128" width="774" height="636" rx="10" fill="#FFFFFF" fill-opacity="0.6" stroke="#5B7DB1" stroke-width="1.6"/>
+<rect x="427" y="158" width="345" height="242" rx="10" fill="#FFFFFF" fill-opacity="0.0" stroke="#138D90" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="828" y="158" width="345" height="592" rx="10" fill="#FFFFFF" fill-opacity="0.0" stroke="#2F6DB5" stroke-width="1.2" stroke-dasharray="5 4"/>
+<g opacity="0.32">
+<rect x="40" y="160" width="317" height="84" rx="8" fill="#FFFFFF" stroke="#6B6B6B" stroke-width="1.4"/>
+<text x="52" y="181" font-size="12.5" font-weight="700" fill="#222">Terminal · Angular CLI v22 + npm</text>
+<text x="52" y="200" font-size="11" fill="#555">ng new eduhub --create-application=false</text>
+<text x="52" y="215" font-size="11" fill="#555">npm run verify = lint + test + build</text>
+<text x="52" y="230" font-size="11" fill="#555">ng serve shell · ng build &lt;app&gt;</text>
+</g>
+<g opacity="0.32">
+<rect x="40" y="290" width="317" height="54" rx="8" fill="#FFFFFF" stroke="#6B6B6B" stroke-width="1.4"/>
+<text x="52" y="311" font-size="12.5" font-weight="700" fill="#222">docs/</text>
+<text x="52" y="330" font-size="11" fill="#555">journal.md · decisions.md (ADR)</text>
+</g>
+<g opacity="0.32">
+<rect x="40" y="420" width="317" height="69" rx="8" fill="#F3F1EA" stroke="#8A8A8A" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="52" y="441" font-size="12.5" font-weight="700" fill="#222">Vitest + Testing Library</text>
+<text x="52" y="460" font-size="11" fill="#555">ng test · setupFiles: listen / reset / close</text>
+<text x="52" y="475" font-size="11" fill="#555">query theo role, label</text>
+</g>
+<g opacity="0.32">
+<rect x="40" y="550" width="317" height="54" rx="8" fill="#F3F1EA" stroke="#8A8A8A" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="52" y="571" font-size="12.5" font-weight="700" fill="#222">libs/testing · renderWithProviders()</text>
+<text x="52" y="590" font-size="11" fill="#555">tenant, user, routes giả cho mỗi test</text>
+</g>
+<g>
+<rect x="40" y="650" width="317" height="54" rx="8" fill="#F3F1EA" stroke="#E67E22" stroke-width="3"/>
+<text x="52" y="671" font-size="12.5" font-weight="700" fill="#222">TestScheduler · marble test</text>
+<text x="52" y="690" font-size="11" fill="#555">4 flattening operator, virtual time</text>
+<rect x="315" y="641" width="34" height="18" rx="9" fill="#E67E22" stroke="#E67E22" stroke-width="1.4"/>
+<text x="332.0" y="654" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">MỚI</text>
+</g>
+<g opacity="0.32">
+<rect x="40" y="1125" width="317" height="54" rx="8" fill="#FFFFFF" stroke="#6B6B6B" stroke-width="1.4"/>
+<text x="52" y="1146" font-size="12.5" font-weight="700" fill="#222">GitHub Actions · ci.yml</text>
+<text x="52" y="1165" font-size="11" fill="#555">npm ci → npm run verify</text>
+</g>
+<g opacity="0.32">
+<rect x="441" y="190" width="317" height="84" rx="8" fill="#DDF2F1" stroke="#138D90" stroke-width="1.4"/>
+<text x="453" y="211" font-size="12.5" font-weight="700" fill="#222">Shell app · bootstrapApplication</text>
+<text x="453" y="230" font-size="11" fill="#555">zoneless · standalone · OnPush</text>
+<text x="453" y="245" font-size="11" fill="#555">router lazy (loadComponent)</text>
+<text x="453" y="260" font-size="11" fill="#555">withComponentInputBinding · guard theo role</text>
+</g>
+<g opacity="0.32">
+<rect x="441" y="330" width="317" height="54" rx="8" fill="#DDF2F1" stroke="#138D90" stroke-width="1.4"/>
+<text x="453" y="351" font-size="12.5" font-weight="700" fill="#222">TenantSwitcher component</text>
+<text x="453" y="370" font-size="11" fill="#555">input() / model() / output() · @for track id</text>
+</g>
+<g opacity="0.32">
+<rect x="842" y="190" width="317" height="54" rx="8" fill="#E3EEFA" stroke="#2F6DB5" stroke-width="1.4"/>
+<text x="854" y="211" font-size="12.5" font-weight="700" fill="#222">@eduhub/* path alias (tsconfig)</text>
+<text x="854" y="230" font-size="11" fill="#555">trỏ thẳng src/public-api.ts, không qua dist</text>
+</g>
+<g opacity="0.32">
+<rect x="842" y="305" width="317" height="84" rx="8" fill="#E3EEFA" stroke="#2F6DB5" stroke-width="1.4"/>
+<text x="854" y="326" font-size="12.5" font-weight="700" fill="#222">libs/tenant</text>
+<text x="854" y="345" font-size="11" fill="#555">TenantService: signal + computed theme</text>
+<text x="854" y="360" font-size="11" fill="#555">TENANT_CONFIG InjectionToken, override ở route</text>
+<text x="854" y="375" font-size="11" fill="#555">tenantInterceptor → X-Tenant-Id · resolver</text>
+</g>
+<g opacity="0.32">
+<rect x="842" y="450" width="317" height="69" rx="8" fill="#E3EEFA" stroke="#2F6DB5" stroke-width="1.4"/>
+<text x="854" y="471" font-size="12.5" font-weight="700" fill="#222">libs/auth</text>
+<text x="854" y="490" font-size="11" fill="#555">authInterceptor: 401 → refresh single-flight</text>
+<text x="854" y="505" font-size="11" fill="#555">roleGuard (functional)</text>
+</g>
+<g opacity="0.32">
+<rect x="842" y="565" width="317" height="54" rx="8" fill="#E3EEFA" stroke="#2F6DB5" stroke-width="1.4"/>
+<text x="854" y="586" font-size="12.5" font-weight="700" fill="#222">libs/ui</text>
+<text x="854" y="605" font-size="11" fill="#555">DataTable · Modal (CDK Overlay) · FormField</text>
+</g>
+<g>
+<rect x="842" y="680" width="317" height="54" rx="8" fill="#E3EEFA" stroke="#E67E22" stroke-width="3"/>
+<text x="854" y="701" font-size="12.5" font-weight="700" fill="#222">libs/util · rx helpers</text>
+<text x="854" y="720" font-size="11" fill="#555">flattening.spec · bảng operator → khi nào dùng</text>
+<rect x="1117" y="671" width="34" height="18" rx="9" fill="#E67E22" stroke="#E67E22" stroke-width="1.4"/>
+<text x="1134.0" y="684" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">MỚI</text>
+</g>
+<g opacity="0.32">
+<rect x="1243" y="160" width="317" height="69" rx="8" fill="#FDEBD8" stroke="#D35400" stroke-width="1.4"/>
+<text x="1255" y="181" font-size="12.5" font-weight="700" fill="#222">browser.ts · setupWorker</text>
+<text x="1255" y="200" font-size="11" fill="#555">public/mockServiceWorker.js · start trước bootstrap</text>
+<text x="1255" y="215" font-size="11" fill="#555">onUnhandledRequest: 'error'</text>
+</g>
+<g opacity="0.32">
+<rect x="1243" y="290" width="317" height="69" rx="8" fill="#FDEBD8" stroke="#D35400" stroke-width="1.4"/>
+<text x="1255" y="311" font-size="12.5" font-weight="700" fill="#222">handlers/ (REST)</text>
+<text x="1255" y="330" font-size="11" fill="#555">courses · thiếu X-Tenant-Id → 400</text>
+<text x="1255" y="345" font-size="11" fill="#555">auth: login, /auth/refresh</text>
+</g>
+<g opacity="0.32">
+<rect x="1243" y="465" width="317" height="69" rx="8" fill="#FBE3DF" stroke="#C0392B" stroke-width="1.4"/>
+<text x="1255" y="486" font-size="12.5" font-weight="700" fill="#222">db/ · @mswjs/data</text>
+<text x="1255" y="505" font-size="11" fill="#555">tenant → course → assignment → grade</text>
+<text x="1255" y="520" font-size="11" fill="#555">seed(db) để test reset được</text>
+</g>
+<g opacity="0.32">
+<rect x="1243" y="825" width="317" height="54" rx="8" fill="#FDEBD8" stroke="#D35400" stroke-width="1.4"/>
+<text x="1255" y="846" font-size="12.5" font-weight="700" fill="#222">server.ts · setupServer (Node)</text>
+<text x="1255" y="865" font-size="11" fill="#555">dùng trong Vitest</text>
+</g>
+<path opacity="0.2" d="M357.0,202.0 C397.0,202.0 401.0,232.0 441.0,232.0" fill="none" stroke="#2F6DB5" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#a-ctrl)"/>
+<path opacity="0.2" d="M758.0,222.0 C798.0,222.0 802.0,217.0 842.0,217.0" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path opacity="0.2" d="M758.0,212.0 C918.0,212.0 1083.0,194.5 1243.0,194.5" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path opacity="0.2" d="M1401.5,229.0 C1401.5,259.0 1401.5,260.0 1401.5,290.0" fill="none" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<path opacity="0.2" d="M1401.5,359.0 C1401.5,406.7 1401.5,417.3 1401.5,465.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path opacity="0.2" d="M357.0,447.0 C517.0,447.0 1083.0,857.0 1243.0,857.0" fill="none" stroke="#2F6DB5" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#a-ctrl)"/>
+<path opacity="0.2" d="M198.5,489.0 C198.5,519.0 198.5,520.0 198.5,550.0" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path opacity="0.2" d="M1243.0,847.0 C1123.0,847.0 1123.0,332.0 1243.0,332.0" fill="none" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<path opacity="0.2" d="M758.0,357.0 C798.0,357.0 802.0,362.0 842.0,362.0" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path opacity="0.2" d="M842.0,332.0 C802.0,332.0 798.0,232.0 758.0,232.0" fill="none" stroke="#D35400" stroke-width="2" marker-end="url(#a-push)"/>
+<path opacity="0.2" d="M758.0,242.0 C798.0,242.0 802.0,347.0 842.0,347.0" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path opacity="0.2" d="M1159.0,484.5 C1199.0,484.5 1203.0,317.0 1243.0,317.0" fill="none" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<path opacity="0.2" d="M357.0,1152.0 C477.0,1152.0 477.0,462.0 357.0,462.0" fill="none" stroke="#2F6DB5" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#a-ctrl)"/>
+<path opacity="0.2" d="M758.0,252.0 C798.0,252.0 802.0,592.0 842.0,592.0" fill="none" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<path d="M357.0,677.0 C517.0,677.0 682.0,707.0 842.0,707.0" fill="none" stroke="#2F6DB5" stroke-width="3" stroke-dasharray="7 4" marker-end="url(#a-ctrl)"/>
+<g opacity="0.35">
+<circle cx="399.0" cy="217.0" r="10.5" fill="#FFFFFF" stroke="#2F6DB5" stroke-width="1.6"/>
+<text x="399.0" y="221.0" text-anchor="middle" font-size="11" font-weight="700" fill="#2F6DB5">1</text>
+</g>
+<g opacity="0.35">
+<circle cx="800.0" cy="219.5" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="800.0" y="223.5" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">2</text>
+</g>
+<g opacity="0.35">
+<circle cx="1185.2" cy="195.2" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="1185.2" y="199.2" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">3</text>
+</g>
+<g opacity="0.35">
+<circle cx="1401.5" cy="259.5" r="10.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.6"/>
+<text x="1401.5" y="263.5" text-anchor="middle" font-size="11" font-weight="700" fill="#777777">4</text>
+</g>
+<g opacity="0.35">
+<circle cx="1401.5" cy="412.0" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="1401.5" y="416.0" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">5</text>
+</g>
+<g opacity="0.35">
+<circle cx="800.0" cy="652.0" r="10.5" fill="#FFFFFF" stroke="#2F6DB5" stroke-width="1.6"/>
+<text x="800.0" y="656.0" text-anchor="middle" font-size="11" font-weight="700" fill="#2F6DB5">6</text>
+</g>
+<g opacity="0.35">
+<circle cx="198.5" cy="519.5" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="198.5" y="523.5" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">7</text>
+</g>
+<g opacity="0.35">
+<circle cx="1155.3" cy="650.8" r="10.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.6"/>
+<text x="1155.3" y="654.8" text-anchor="middle" font-size="11" font-weight="700" fill="#777777">8</text>
+</g>
+<g opacity="0.35">
+<circle cx="800.0" cy="359.5" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="800.0" y="363.5" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">9</text>
+</g>
+<g opacity="0.35">
+<circle cx="800.0" cy="282.0" r="10.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.6"/>
+<text x="800.0" y="286.0" text-anchor="middle" font-size="11" font-weight="700" fill="#D35400">10</text>
+</g>
+<g opacity="0.35">
+<circle cx="805.3" cy="307.0" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="805.3" y="311.0" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">11</text>
+</g>
+<g opacity="0.35">
+<circle cx="1201.0" cy="400.8" r="10.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.6"/>
+<text x="1201.0" y="404.8" text-anchor="middle" font-size="11" font-weight="700" fill="#C0392B">12</text>
+</g>
+<g opacity="0.35">
+<circle cx="447.0" cy="807.0" r="10.5" fill="#FFFFFF" stroke="#2F6DB5" stroke-width="1.6"/>
+<text x="447.0" y="811.0" text-anchor="middle" font-size="11" font-weight="700" fill="#2F6DB5">13</text>
+</g>
+<g opacity="0.35">
+<circle cx="800.0" cy="422.0" r="10.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.6"/>
+<text x="800.0" y="426.0" text-anchor="middle" font-size="11" font-weight="700" fill="#7A4FB5">14</text>
+</g>
+<g>
+<circle cx="599.5" cy="692.0" r="10.5" fill="#2F6DB5" stroke="#2F6DB5" stroke-width="1.6"/>
+<text x="599.5" y="696.0" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">15</text>
+</g>
+<rect x="34" y="134" width="98" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="40" y="148" font-size="12.5" font-weight="700" fill="#333">Máy dev &amp; CI</text>
+<rect x="1237" y="134" width="357" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="1243" y="148" font-size="12.5" font-weight="700" fill="#333">libs/mocks · MSW (dùng chung dev, test, SSR, E2E)</text>
+<rect x="421" y="134" width="196" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="427" y="148" font-size="12.5" font-weight="700" fill="#333">Trình duyệt · origin :4200</text>
+<rect x="435" y="164" width="84" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="441" y="178" font-size="12.5" font-weight="700" fill="#333">apps/shell</text>
+<rect x="836" y="164" width="189" height="20" rx="4" fill="#FDFCF8" fill-opacity="0.92"/>
+<text x="842" y="178" font-size="12.5" font-weight="700" fill="#333">projects/libs · @eduhub/*</text>
+<line x1="40" y1="1245" x2="80" y2="1245" stroke="#C0392B" stroke-width="2" marker-end="url(#a-http)"/>
+<text x="90" y="1249" font-size="11.5" fill="#333">Data plane: HTTP / WebSocket tới API (do MSW trả lời)</text>
+<line x1="562" y1="1245" x2="602" y2="1245" stroke="#2F6DB5" stroke-width="2" stroke-dasharray="7 4" marker-end="url(#a-ctrl)"/>
+<text x="612" y="1249" font-size="11.5" fill="#333">Điều khiển: CLI, test runner, CI chạy / build / đo</text>
+<line x1="1084" y1="1245" x2="1124" y2="1245" stroke="#7A4FB5" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#a-di)"/>
+<text x="1134" y="1249" font-size="11.5" fill="#333">DI / import / đọc signal giữa các khối code</text>
+<line x1="40" y1="1269" x2="80" y2="1269" stroke="#D35400" stroke-width="2" marker-end="url(#a-push)"/>
+<text x="90" y="1273" font-size="11.5" fill="#333">Push: event realtime, effect, HTML render, state</text>
+<line x1="562" y1="1269" x2="602" y2="1269" stroke="#777777" stroke-width="2" marker-end="url(#a-local)"/>
+<text x="612" y="1273" font-size="11.5" fill="#333">Nội bộ trong cùng runtime / chuyển tiếp</text>
+<rect x="1084" y="1261" width="40" height="16" rx="4" fill="#FFFFFF" stroke="#E67E22" stroke-width="3"/>
+<text x="1134" y="1273" font-size="11.5" fill="#333">Viền cam / số đặc = thêm trong ngày · chữ cam = dòng mới</text>
+<text x="40" y="1315" font-size="14" font-weight="700" fill="#222">Quan hệ giữa các thành phần (số trên mũi tên)</text>
+<g opacity="0.5">
+<circle cx="50" cy="1341" r="9.5" fill="#FFFFFF" stroke="#2F6DB5" stroke-width="1.5"/>
+<text x="50" y="1345" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2F6DB5">1</text>
+<text x="68" y="1345" font-size="11.5" font-weight="700" fill="#333">Terminal · Angular CLI v22 + npm → Shell app · bootstrapApplication</text>
+<text x="68" y="1361" font-size="11.5" fill="#333">ng serve / ng build shell</text>
+</g>
+<g opacity="0.5">
+<circle cx="50" cy="1387" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="50" y="1391" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">2</text>
+<text x="68" y="1391" font-size="11.5" font-weight="700" fill="#333">Shell app · bootstrapApplication → @eduhub/* path alias (tsconfig)</text>
+<text x="68" y="1407" font-size="11.5" fill="#333">import @eduhub/* qua path alias</text>
+</g>
+<g opacity="0.5">
+<circle cx="50" cy="1433" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="50" y="1437" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">3</text>
+<text x="68" y="1437" font-size="11.5" font-weight="700" fill="#333">Shell app · bootstrapApplication → browser.ts · setupWorker</text>
+<text x="68" y="1453" font-size="11.5" fill="#333">fetch /api/* bị Service Worker chặn</text>
+</g>
+<g opacity="0.5">
+<circle cx="50" cy="1479" r="9.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.5"/>
+<text x="50" y="1483" text-anchor="middle" font-size="10.5" font-weight="700" fill="#777777">4</text>
+<text x="68" y="1483" font-size="11.5" font-weight="700" fill="#333">browser.ts · setupWorker → handlers/ (REST)</text>
+<text x="68" y="1499" font-size="11.5" fill="#333">chuyển request tới handler</text>
+</g>
+<g opacity="0.5">
+<circle cx="50" cy="1525" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="50" y="1529" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">5</text>
+<text x="68" y="1529" font-size="11.5" font-weight="700" fill="#333">handlers/ (REST) → db/ · @mswjs/data</text>
+<text x="68" y="1545" font-size="11.5" fill="#333">query / mutate theo X-Tenant-Id</text>
+</g>
+<g opacity="0.5">
+<circle cx="50" cy="1571" r="9.5" fill="#FFFFFF" stroke="#2F6DB5" stroke-width="1.5"/>
+<text x="50" y="1575" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2F6DB5">6</text>
+<text x="68" y="1575" font-size="11.5" font-weight="700" fill="#333">Vitest + Testing Library → server.ts · setupServer (Node)</text>
+<text x="68" y="1591" font-size="11.5" fill="#333">beforeAll listen · afterEach reset + seed</text>
+</g>
+<g opacity="0.5">
+<circle cx="50" cy="1617" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="50" y="1621" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">7</text>
+<text x="68" y="1621" font-size="11.5" font-weight="700" fill="#333">Vitest + Testing Library → libs/testing · renderWithProviders()</text>
+<text x="68" y="1637" font-size="11.5" fill="#333">render component với provider giả</text>
+</g>
+<g opacity="0.5">
+<circle cx="50" cy="1663" r="9.5" fill="#FFFFFF" stroke="#777777" stroke-width="1.5"/>
+<text x="50" y="1667" text-anchor="middle" font-size="10.5" font-weight="700" fill="#777777">8</text>
+<text x="68" y="1667" font-size="11.5" font-weight="700" fill="#333">server.ts · setupServer (Node) → handlers/ (REST)</text>
+<text x="68" y="1683" font-size="11.5" fill="#333">cùng bộ handler với trình duyệt</text>
+</g>
+<g opacity="0.5">
+<circle cx="833" cy="1341" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="833" y="1345" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">9</text>
+<text x="851" y="1345" font-size="11.5" font-weight="700" fill="#333">TenantSwitcher component → libs/tenant</text>
+<text x="851" y="1361" font-size="11.5" fill="#333">đọc / ghi signal tenant</text>
+</g>
+<g opacity="0.5">
+<circle cx="833" cy="1387" r="9.5" fill="#FFFFFF" stroke="#D35400" stroke-width="1.5"/>
+<text x="833" y="1391" text-anchor="middle" font-size="10.5" font-weight="700" fill="#D35400">10</text>
+<text x="851" y="1391" font-size="11.5" font-weight="700" fill="#333">libs/tenant → Shell app · bootstrapApplication</text>
+<text x="851" y="1407" font-size="11.5" fill="#333">effect: CSS variable theme, document.title</text>
+</g>
+<g opacity="0.5">
+<circle cx="833" cy="1433" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="833" y="1437" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">11</text>
+<text x="851" y="1437" font-size="11.5" font-weight="700" fill="#333">Shell app · bootstrapApplication → libs/tenant</text>
+<text x="851" y="1453" font-size="11.5" fill="#333">withInterceptors: tenant → auth → error</text>
+</g>
+<g opacity="0.5">
+<circle cx="833" cy="1479" r="9.5" fill="#FFFFFF" stroke="#C0392B" stroke-width="1.5"/>
+<text x="833" y="1483" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C0392B">12</text>
+<text x="851" y="1483" font-size="11.5" font-weight="700" fill="#333">libs/auth → handlers/ (REST)</text>
+<text x="851" y="1499" font-size="11.5" fill="#333">POST /auth/refresh đúng 1 lần cho N request 401</text>
+</g>
+<g opacity="0.5">
+<circle cx="833" cy="1525" r="9.5" fill="#FFFFFF" stroke="#2F6DB5" stroke-width="1.5"/>
+<text x="833" y="1529" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2F6DB5">13</text>
+<text x="851" y="1529" font-size="11.5" font-weight="700" fill="#333">GitHub Actions · ci.yml → Vitest + Testing Library</text>
+<text x="851" y="1545" font-size="11.5" fill="#333">npm run verify trên mỗi push</text>
+</g>
+<g opacity="0.5">
+<circle cx="833" cy="1571" r="9.5" fill="#FFFFFF" stroke="#7A4FB5" stroke-width="1.5"/>
+<text x="833" y="1575" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7A4FB5">14</text>
+<text x="851" y="1575" font-size="11.5" font-weight="700" fill="#333">Shell app · bootstrapApplication → libs/ui</text>
+<text x="851" y="1591" font-size="11.5" fill="#333">DataTable, Modal, FormField</text>
+</g>
+<g>
+<circle cx="833" cy="1617" r="9.5" fill="#2F6DB5" stroke="#2F6DB5" stroke-width="1.5"/>
+<text x="833" y="1621" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFFFFF">15</text>
+<text x="851" y="1621" font-size="11.5" font-weight="700" fill="#333">TestScheduler · marble test → libs/util · rx helpers</text>
+<text x="851" y="1637" font-size="11.5" fill="#E67E22">marble test cho helper RxJS</text>
+</g>
+</svg>
