@@ -67,7 +67,7 @@ Hình của từng ngày dùng chung một bố cục chi tiết. Khối viền 
 ```bash
 node -v                      # >= 22
 npm i -g @angular/cli@22
-ng new eduhub --create-application=false --package-manager=npm
+ng new eduhub --directory ./ --create-application=false --package-manager=npm
 cd eduhub
 ng add angular-eslint
 npm i -D prettier
