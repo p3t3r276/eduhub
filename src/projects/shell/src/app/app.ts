@@ -1,5 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   imports: [RouterOutlet],
@@ -9,4 +11,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('shell');
+  private http = inject(HttpClient);
+  courses = toSignal(this.http.get<{ id: string; title: string }[]>('/api/courses', {
+    headers: {
+      'X-Tenant-Id': 'alpha'
+    }
+  }))
 }

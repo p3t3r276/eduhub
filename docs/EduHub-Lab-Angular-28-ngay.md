@@ -110,6 +110,86 @@ done
 ng serve shell
 ```
 
+**Snippet:**
+
+`tsconfig.json` – alias trỏ thẳng vào source (xóa các alias `dist/` do `ng g library` sinh ra):
+
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@eduhub/ui": ["./projects/libs/ui/src/public-api.ts"],
+      "@eduhub/data-access": ["./projects/libs/data-access/src/public-api.ts"],
+      "@eduhub/auth": ["./projects/libs/auth/src/public-api.ts"],
+      "@eduhub/tenant": ["./projects/libs/tenant/src/public-api.ts"],
+      "@eduhub/util": ["./projects/libs/util/src/public-api.ts"],
+      "@eduhub/mocks": ["./projects/libs/mocks/src/public-api.ts"],
+      "@eduhub/testing": ["./projects/libs/testing/src/public-api.ts"]
+    }
+  }
+}
+```
+
+`angular.json` – kiểm tra target build của `shell` không còn `zone.js`:
+
+```json
+"polyfills": []
+```
+
+`projects/libs/ui/src/lib/ui-button/ui-button.ts` – component mẫu (tạo bằng `ng g component ui-button --project=ui`, selector có prefix `ui`):
+
+```ts
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+
+@Component({
+  selector: 'ui-button',
+  template: `<button type="button"><ng-content /> {{ label() }}</button>`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class UiButton {
+  label = input('');
+}
+```
+
+`projects/libs/ui/src/public-api.ts`:
+
+```ts
+export * from './lib/ui-button/ui-button';
+```
+
+`projects/shell/src/app/app.ts` – import thử từ alias:
+
+```ts
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { UiButton } from '@eduhub/ui';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, UiButton],
+  template: `<ui-button label="Xin chào EduHub" /><router-outlet />`,
+})
+export class App {}
+```
+
+`eslint.config.js` (nếu dùng angular-eslint) – bắt selector sai prefix, ví dụ cho lib `ui`:
+
+```js
+{
+  files: ['projects/libs/ui/**/*.ts'],
+  rules: {
+    '@angular-eslint/component-selector': ['error', { type: 'element', prefix: 'ui', style: 'kebab-case' }],
+    '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'ui', style: 'camelCase' }],
+  },
+}
+```
+
+Kiểm tra:
+
+```bash
+ng build shell
+```
+
 **Xong khi:** `shell` import được một component từ `@eduhub/ui` và `ng build shell` xanh.
 
 ### Ngày 2 – MSW: DB giả và handler đầu tiên (Thứ Ba 27/10)
@@ -133,6 +213,126 @@ npx msw init projects/shell/public --save
 # tạo: libs/mocks/src/{db/,handlers/,scenarios/,browser.ts,server.ts}
 ng serve shell   # DevTools > Console thấy "[MSW] Mocking enabled"
 ```
+
+**Snippet:**
+
+`libs/mocks/src/db/index.ts` – DB giả và seed:
+
+```ts
+import { factory, primaryKey } from '@mswjs/data';
+import { faker } from '@faker-js/faker';
+
+export const db = factory({
+  course: {
+    id: primaryKey(faker.string.uuid),
+    tenantId: String,
+    title: String,
+  },
+});
+
+export function seed(d: typeof db = db) {
+  for (const tenantId of ['alpha', 'beta']) {
+    for (let i = 0; i < 5; i++) {
+      d.course.create({ tenantId, title: `${tenantId} – ${faker.lorem.words(3)}` });
+    }
+  }
+}
+
+export function reset(d: typeof db = db) {
+  d.course.deleteMany({ where: {} });
+  seed(d);
+}
+```
+
+`libs/mocks/src/handlers/courses.ts` – handler đọc `X-Tenant-Id`:
+
+```ts
+import { http, HttpResponse } from 'msw';
+import { db } from '../db';
+
+export const courseHandlers = [
+  http.get('/api/courses', ({ request }) => {
+    const tenantId = request.headers.get('X-Tenant-Id');
+    if (!tenantId) {
+      return HttpResponse.json({ message: 'Missing X-Tenant-Id' }, { status: 400 });
+    }
+    return HttpResponse.json(db.course.findMany({ where: { tenantId: { equals: tenantId } } }));
+  }),
+];
+```
+
+`libs/mocks/src/handlers/index.ts`:
+
+```ts
+import { courseHandlers } from './courses';
+
+export const handlers = [...courseHandlers];
+```
+
+`libs/mocks/src/browser.ts` và `server.ts`:
+
+```ts
+// browser.ts
+import { setupWorker } from 'msw/browser';
+import { handlers } from './handlers';
+export const worker = setupWorker(...handlers);
+
+// server.ts (dùng cho test)
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+export const server = setupServer(...handlers);
+```
+
+`libs/mocks/src/public-api.ts`:
+
+```ts
+export * from './db';
+export * from './handlers';
+export { worker } from './browser';
+```
+
+`projects/shell/src/main.ts` – khởi động worker trước khi bootstrap:
+
+```ts
+import { isDevMode } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { App } from './app/app';
+
+async function enableMocking(): Promise<void> {
+  if (!isDevMode()) return;
+  const { worker, seed } = await import('@eduhub/mocks');
+  seed();
+  await worker.start({ onUnhandledFrame: 'error' });
+}
+
+enableMocking()
+  .then(() => bootstrapApplication(App, appConfig))
+  .catch((err) => console.error(err));
+```
+
+`projects/shell/src/app/app.config.ts` – bật `HttpClient`:
+
+```ts
+import { provideHttpClient, withFetch } from '@angular/common/http';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideHttpClient(withFetch()) /* ...providers khác */],
+};
+```
+
+Gọi thử trong `app.ts` (tạm thời, trước khi có interceptor):
+
+```ts
+private http = inject(HttpClient);
+courses = toSignal(
+  this.http.get<{ id: string; title: string }[]>('/api/courses', {
+    headers: { 'X-Tenant-Id': 'alpha' },
+  }),
+);
+```
+
+Template: `@for (c of courses(); track c.id) { <li>{{ c.title }}</li> }`
 
 **Xong khi:** tab Network thấy request `/api/courses` được MSW trả về, đổi header tenant thì dữ liệu khác.
 
