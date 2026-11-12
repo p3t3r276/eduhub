@@ -289,6 +289,7 @@ export const server = setupServer(...handlers);
 export * from './db';
 export * from './handlers';
 export { worker } from './browser';
+export { server } from './server';
 ```
 
 `projects/shell/src/main.ts` – khởi động worker trước khi bootstrap:
@@ -314,10 +315,10 @@ enableMocking()
 `projects/shell/src/app/app.config.ts` – bật `HttpClient`:
 
 ```ts
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideHttpClient(withFetch()) /* ...providers khác */],
+  providers: [provideHttpClient() /* ...providers khác */],
 };
 ```
 
@@ -345,7 +346,7 @@ Template: `@for (c of courses(); track c.id) { <li>{{ c.title }}</li> }`
 **Chú ý:**
 
 - `setupFiles` trong target `test` của `angular.json` trỏ tới `test-setup.ts`: `beforeAll(server.listen)`, `afterEach(server.resetHandlers + seed lại db)`, `afterAll(server.close)`.
-- Dùng `provideHttpClient(withFetch())` để app và test cùng một đường HTTP.
+- Dùng `provideHttpClient()` (mặc định đã dùng Fetch, `withFetch()` đã deprecated) để app và test cùng một đường HTTP.
 - `renderWithProviders()` trong `libs/testing` nhận tham số `tenant`, `user`, `routes` để mỗi test chỉ khai báo điều nó quan tâm.
 
 **Lệnh:**
@@ -385,13 +386,11 @@ afterEach(() => {
 afterAll(() => server.close());
 ```
 
-Export `server` trong `libs/mocks/src/public-api.ts` (thêm `export { server } from './server';`). Chỉ import từ test, không đưa vào bundle app.
-
 `libs/testing/src/render-with-providers.ts`:
 
 ```ts
 import { Type } from '@angular/core';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, Routes } from '@angular/router';
 import { render, RenderResult } from '@testing-library/angular';
 
@@ -407,7 +406,7 @@ export async function renderWithProviders<T>(
 ): Promise<RenderResult<T>> {
   return render(component, {
     providers: [
-      provideHttpClient(withFetch()),
+      provideHttpClient(),
       provideRouter(routes),
       // Ngày 6 sẽ thay bằng interceptor đọc tenant từ TenantService
       { provide: 'TEST_TENANT', useValue: tenant },
