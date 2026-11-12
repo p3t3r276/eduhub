@@ -356,6 +356,133 @@ ng test shell --no-watch
 ng test mocks --no-watch
 ```
 
+**Snippet:**
+
+`angular.json` – target `test` của shell:
+
+```json
+"test": {
+  "builder": "@angular/build:unit-test",
+  "options": {
+    "runner": "vitest",
+    "setupFiles": ["projects/shell/src/test-setup.ts"]
+  }
+}
+```
+
+`projects/shell/src/test-setup.ts` – vòng đời MSW server:
+
+```ts
+import '@testing-library/jest-dom/vitest';
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server, reset } from '@eduhub/mocks';
+
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
+afterEach(() => {
+  server.resetHandlers();
+  reset();
+});
+afterAll(() => server.close());
+```
+
+Export `server` trong `libs/mocks/src/public-api.ts` (thêm `export { server } from './server';`). Chỉ import từ test, không đưa vào bundle app.
+
+`libs/testing/src/render-with-providers.ts`:
+
+```ts
+import { Type } from '@angular/core';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideRouter, Routes } from '@angular/router';
+import { render, RenderResult } from '@testing-library/angular';
+
+export interface RenderOptions {
+  tenant?: string;
+  user?: { id: string; role: 'student' | 'teacher' };
+  routes?: Routes;
+}
+
+export async function renderWithProviders<T>(
+  component: Type<T>,
+  { tenant = 'alpha', user, routes = [] }: RenderOptions = {},
+): Promise<RenderResult<T>> {
+  return render(component, {
+    providers: [
+      provideHttpClient(withFetch()),
+      provideRouter(routes),
+      // Ngày 6 sẽ thay bằng interceptor đọc tenant từ TenantService
+      { provide: 'TEST_TENANT', useValue: tenant },
+      { provide: 'TEST_USER', useValue: user ?? null },
+    ],
+  });
+}
+```
+
+`projects/shell/src/app/course-list.ts` – component để test:
+
+```ts
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, map, of, startWith } from 'rxjs';
+
+type Course = { id: string; title: string };
+type State = { courses: Course[]; error: boolean };
+
+@Component({
+  selector: 'app-course-list',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    @if (state().error) {
+      <p role="alert">Không tải được danh sách khóa học</p>
+    } @else {
+      <ul>
+        @for (c of state().courses; track c.id) {
+          <li>{{ c.title }}</li>
+        }
+      </ul>
+    }
+  `,
+})
+export class CourseList {
+  private http = inject(HttpClient);
+  state = toSignal(
+    this.http.get<Course[]>('/api/courses', { headers: { 'X-Tenant-Id': 'alpha' } }).pipe(
+      map((courses): State => ({ courses, error: false })),
+      catchError(() => of<State>({ courses: [], error: true })),
+      startWith<State>({ courses: [], error: false }),
+    ),
+    { requireSync: true },
+  );
+}
+```
+
+`projects/shell/src/app/course-list.spec.ts`:
+
+```ts
+import { screen } from '@testing-library/angular';
+import { http, HttpResponse } from 'msw';
+import { server } from '@eduhub/mocks';
+import { renderWithProviders } from '@eduhub/testing';
+import { CourseList } from './course-list';
+
+describe('CourseList', () => {
+  it('render khóa học của tenant alpha từ MSW', async () => {
+    await renderWithProviders(CourseList);
+    const items = await screen.findAllByRole('listitem');
+    expect(items).toHaveLength(5);
+    expect(items[0]).toHaveTextContent(/^alpha/);
+  });
+
+  it('hiện thông báo lỗi khi API trả 500', async () => {
+    server.use(http.get('/api/courses', () => new HttpResponse(null, { status: 500 })));
+    await renderWithProviders(CourseList);
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+  });
+});
+```
+
+Lưu ý: URL tương đối `/api/courses` cần base URL trong môi trường test (jsdom/happy-dom). Nếu `fetch` báo invalid URL, dùng handler với `'*/api/courses'` hoặc đặt `url` trong cấu hình môi trường test.
+
 **Xong khi:** 1 test render danh sách khóa học từ MSW xanh, và `server.use(...500)` làm test hiện thông báo lỗi.
 
 ### Ngày 4 – Signals cốt lõi + TenantService (Thứ Năm 29/10)
@@ -377,6 +504,121 @@ ng test mocks --no-watch
 ng g service tenant --project=tenant
 ng g component tenant-switcher --project=shell
 ng test tenant --no-watch
+```
+
+**Snippet:**
+
+`libs/tenant/src/tenant.service.ts`:
+
+```ts
+import { computed, effect, Injectable, signal } from '@angular/core';
+
+export type Theme = { primary: string; name: string };
+
+const THEMES: Record<string, Theme> = {
+  alpha: { name: 'Alpha', primary: '#1d4ed8' },
+  beta: { name: 'Beta', primary: '#15803d' },
+};
+
+@Injectable({ providedIn: 'root' })
+export class TenantService {
+  readonly tenantId = signal('alpha');
+  readonly theme = computed(() => THEMES[this.tenantId()] ?? THEMES['alpha']);
+  readonly locale = computed(() => (this.tenantId() === 'beta' ? 'en-US' : 'vi-VN'));
+
+  constructor() {
+    // effect chỉ đồng bộ ra ngoài (CSS variable, title), không set signal khác
+    effect(() => {
+      const { primary, name } = this.theme();
+      document.documentElement.style.setProperty('--color-primary', primary);
+      document.title = `EduHub – ${name}`;
+    });
+  }
+
+  setTenant(id: string) {
+    this.tenantId.set(id);
+  }
+}
+```
+
+`libs/tenant/src/public-api.ts`: `export * from './tenant.service';`
+
+`projects/shell/src/app/tenant-switcher/tenant-switcher.ts`:
+
+```ts
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { TenantService } from '@eduhub/tenant';
+
+@Component({
+  selector: 'app-tenant-switcher',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <label>
+      {{ label() }}
+      <select [value]="tenant.tenantId()" (change)="onChange($any($event.target).value)">
+        @for (id of tenants(); track id) {
+          <option [value]="id">{{ id }}</option>
+        }
+      </select>
+    </label>
+  `,
+})
+export class TenantSwitcher {
+  protected tenant = inject(TenantService);
+  tenants = input.required<string[]>();
+  label = input('Tenant');
+  changed = output<string>();
+
+  onChange(id: string) {
+    this.tenant.setTenant(id);
+    this.changed.emit(id);
+  }
+}
+```
+
+Dùng trong `app.ts`: `<app-tenant-switcher [tenants]="['alpha', 'beta']" />` và import `TenantSwitcher`.
+
+`libs/tenant/src/tenant.service.spec.ts`:
+
+```ts
+import { TestBed } from '@angular/core/testing';
+import { TenantService } from './tenant.service';
+
+describe('TenantService', () => {
+  it('đổi tenant thì theme và locale đổi', () => {
+    const svc = TestBed.inject(TenantService);
+    expect(svc.theme().name).toBe('Alpha');
+    svc.setTenant('beta');
+    expect(svc.theme().name).toBe('Beta');
+    expect(svc.locale()).toBe('en-US');
+  });
+
+  it('effect ghi CSS variable', () => {
+    const svc = TestBed.inject(TenantService);
+    svc.setTenant('beta');
+    TestBed.tick();
+    expect(document.documentElement.style.getPropertyValue('--color-primary')).toBe('#15803d');
+  });
+});
+```
+
+`tenant-switcher.spec.ts` (zoneless, không cần Zone.js):
+
+```ts
+import { provideZonelessChangeDetection } from '@angular/core';
+import { render, screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
+import { TenantService } from '@eduhub/tenant';
+import { TenantSwitcher } from './tenant-switcher';
+
+it('chọn beta thì TenantService đổi tenant', async () => {
+  const { fixture } = await render(TenantSwitcher, {
+    inputs: { tenants: ['alpha', 'beta'] },
+    providers: [provideZonelessChangeDetection()],
+  });
+  await userEvent.selectOptions(screen.getByRole('combobox'), 'beta');
+  expect(fixture.debugElement.injector.get(TenantService).tenantId()).toBe('beta');
+});
 ```
 
 **Xong khi:** test chứng minh đổi tenant thì `computed` theme đổi, và component switcher hoạt động mà không có Zone.js.
