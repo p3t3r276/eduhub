@@ -12,12 +12,71 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "paths": {
+      "@eduhub/auth": ["./projects/libs/auth/src/public-api.ts"],
+      "@eduhub/data-access": ["./projects/libs/data-access/src/public-api.ts"],
+      "@eduhub/mocks": ["./projects/libs/mocks/src/public-api.ts"],
+      "@eduhub/tenant": ["./projects/libs/tenant/src/public-api.ts"],
+      "@eduhub/testing": ["./projects/libs/testing/src/public-api.ts"],
+      "@eduhub/ui": ["./projects/libs/ui/src/public-api.ts"],
+      "@eduhub/util": ["./projects/libs/util/src/public-api.ts"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true
   },
-  "files": []
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/shell/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/shell/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/libs/ui/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/libs/ui/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/libs/data-access/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/libs/data-access/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/libs/auth/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/libs/auth/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/libs/tenant/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/libs/tenant/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/libs/util/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/libs/util/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/libs/mocks/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/libs/mocks/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/libs/testing/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/libs/testing/tsconfig.spec.json"
+    }
+  ]
 }
