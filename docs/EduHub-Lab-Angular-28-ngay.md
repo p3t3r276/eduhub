@@ -376,9 +376,12 @@ ng test mocks --no-watch
 ```ts
 import '@testing-library/jest-dom/vitest';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { server, reset } from '@eduhub/mocks';
+import { server, reset, seed } from '@eduhub/mocks';
 
-beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
+beforeAll(() => {
+    server.listen({ onUnhandledFrame: 'error' });
+    seed();
+});
 afterEach(() => {
   server.resetHandlers();
   reset();
