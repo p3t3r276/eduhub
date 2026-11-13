@@ -17,6 +17,7 @@
       "@eduhub/auth": ["./projects/libs/auth/src/public-api.ts"],
       "@eduhub/data-access": ["./projects/libs/data-access/src/public-api.ts"],
       "@eduhub/mocks": ["./projects/libs/mocks/src/public-api.ts"],
+      "@eduhub/mocks/node": ["./projects/libs/mocks/src/server.ts"],
       "@eduhub/tenant": ["./projects/libs/tenant/src/public-api.ts"],
       "@eduhub/testing": ["./projects/libs/testing/src/public-api.ts"],
       "@eduhub/ui": ["./projects/libs/ui/src/public-api.ts"],

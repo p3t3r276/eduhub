@@ -10,6 +10,9 @@
 @for(c of courses(); track c.id) {
   <li>{{ c.title }}</li>
 }
+
+<app-tenant-switcher [tenants]="['alpha', 'beta']" />
+
 <style>
   :host {
     --bright-blue: oklch(51.01% 0.274 263.83);

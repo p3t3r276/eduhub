@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { server, reset, seed } from '@eduhub/mocks';
+import { reset, seed } from '@eduhub/mocks';
+import { server } from '@eduhub/mocks/node';
 
 beforeAll(() => {
     server.listen({ onUnhandledFrame: 'error' });

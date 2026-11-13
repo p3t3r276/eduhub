@@ -3,3 +3,4 @@
  */
 
 export * from './lib/tenant';
+export * from './tenant.service';
