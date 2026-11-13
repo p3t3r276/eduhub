@@ -643,6 +643,181 @@ it('chọn beta thì TenantService đổi tenant', async () => {
 ng test tenant --no-watch
 ```
 
+**Snippet:**
+
+`libs/tenant/src/tenant.config.ts` – token có default ở root, và helper để override:
+
+```ts
+import { inject, InjectionToken, Injector, Provider, runInInjectionContext } from '@angular/core';
+
+export interface TenantConfig {
+  tenantId: string;
+  currency: string;
+  features: { reports: boolean };
+}
+
+export const DEFAULT_TENANT_CONFIG: TenantConfig = {
+  tenantId: 'alpha',
+  currency: 'VND',
+  features: { reports: false },
+};
+
+// providedIn: 'root' + factory: không cần khai báo ở đâu cả vẫn inject được
+export const TENANT_CONFIG = new InjectionToken<TenantConfig>('TENANT_CONFIG', {
+  providedIn: 'root',
+  factory: () => DEFAULT_TENANT_CONFIG,
+});
+
+// Override một phần: lấy config của injector cha (skipSelf) rồi merge
+export function provideTenantConfig(override: Partial<TenantConfig>): Provider {
+  return {
+    provide: TENANT_CONFIG,
+    useFactory: (): TenantConfig => ({
+      ...(inject(TENANT_CONFIG, { skipSelf: true, optional: true }) ?? DEFAULT_TENANT_CONFIG),
+      ...override,
+    }),
+  };
+}
+
+// Ngoài injection context (callback, setTimeout, hàm thường): truyền Injector vào
+export function readTenantConfig(injector: Injector): TenantConfig {
+  return runInInjectionContext(injector, () => inject(TENANT_CONFIG));
+}
+```
+
+`libs/tenant/src/public-api.ts`: thêm `export * from './tenant.config';`
+
+`projects/shell/src/app/reports/reports.ts` – component đọc config từ injector gần nhất:
+
+```ts
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { TENANT_CONFIG } from '@eduhub/tenant';
+
+@Component({
+  selector: 'app-reports',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <h2>Báo cáo – {{ config.tenantId }}</h2>
+    @if (config.features.reports) {
+      <p>Đơn vị tiền tệ: {{ config.currency }}</p>
+    } @else {
+      <p role="alert">Tenant này chưa bật báo cáo</p>
+    }
+  `,
+})
+export class Reports {
+  protected readonly config = inject(TENANT_CONFIG);
+}
+```
+
+`projects/shell/src/app/app.routes.ts` – override ở `providers` của route cha `t/beta`:
+
+```ts
+import { Routes } from '@angular/router';
+import { provideTenantConfig } from '@eduhub/tenant';
+
+export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'courses' },
+  { path: 'courses', loadComponent: () => import('./course-list').then((m) => m.CourseList) },
+  { path: 'reports', loadComponent: () => import('./reports/reports').then((m) => m.Reports) },
+  {
+    path: 't/beta',
+    // Route tạo EnvironmentInjector con: mọi route con thấy config này
+    providers: [provideTenantConfig({ tenantId: 'beta', currency: 'USD', features: { reports: true } })],
+    children: [
+      { path: 'reports', loadComponent: () => import('./reports/reports').then((m) => m.Reports) },
+    ],
+  },
+];
+```
+
+`libs/tenant/src/tenant.config.spec.ts` – chứng minh injector nào resolve provider nào:
+
+```ts
+import { Component, inject, Injector } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { provideTenantConfig, readTenantConfig, TENANT_CONFIG } from './tenant.config';
+
+@Component({ template: `{{ config.tenantId }}` })
+class Probe {
+  config = inject(TENANT_CONFIG);
+}
+
+@Component({
+  selector: 'scoped-probe',
+  providers: [provideTenantConfig({ tenantId: 'gamma' })],
+  template: ``,
+})
+class ScopedProbe {
+  config = inject(TENANT_CONFIG);
+}
+
+describe('TENANT_CONFIG', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([
+          { path: 'reports', component: Probe },
+          {
+            path: 't/beta',
+            providers: [provideTenantConfig({ tenantId: 'beta', features: { reports: true } })],
+            children: [{ path: 'reports', component: Probe }],
+          },
+        ]),
+      ],
+    });
+  });
+
+  it('route /t/beta/reports nhận config override', async () => {
+    const harness = await RouterTestingHarness.create();
+    const probe = await harness.navigateByUrl('/t/beta/reports', Probe);
+    expect(probe.config.tenantId).toBe('beta');
+    expect(probe.config.features.reports).toBe(true);
+    expect(probe.config.currency).toBe('VND'); // phần không override lấy từ cha
+  });
+
+  it('route khác vẫn nhận default', async () => {
+    const harness = await RouterTestingHarness.create();
+    const probe = await harness.navigateByUrl('/reports', Probe);
+    expect(probe.config.tenantId).toBe('alpha');
+  });
+
+  it('providers ở component tạo instance riêng cho component đó', () => {
+    const fixture = TestBed.createComponent(ScopedProbe);
+    expect(fixture.componentInstance.config.tenantId).toBe('gamma');
+    expect(TestBed.inject(TENANT_CONFIG).tenantId).toBe('alpha'); // root không bị ảnh hưởng
+  });
+
+  it('inject() ngoài injection context ném NG0203, runInInjectionContext thì được', () => {
+    expect(() => inject(TENANT_CONFIG)).toThrow(/NG0203/);
+    expect(readTenantConfig(TestBed.inject(Injector)).tenantId).toBe('alpha');
+  });
+});
+```
+
+`docs/decisions.md` – ADR:
+
+```md
+## ADR-001: Chỗ đặt provider cho cấu hình theo tenant (30/10)
+
+**Bối cảnh:** cần config mặc định cho cả app, nhưng một nhánh route (`/t/beta/...`) cần giá trị khác.
+
+**Quyết định:**
+- `TENANT_CONFIG` là `InjectionToken` với `providedIn: 'root'` + `factory` → default, tree-shakable.
+- Override bằng `providers` ở route cha (`provideTenantConfig`), không đặt ở component.
+- `provideTenantConfig` merge với config của injector cha (`skipSelf`), chỉ ghi đè phần cần đổi.
+
+| Chỗ đặt | Injector | Vòng đời | Dùng khi |
+|---|---|---|---|
+| `providedIn: 'root'` | Root EnvironmentInjector | Singleton suốt app | Default, service dùng chung |
+| `providers` ở route | EnvironmentInjector con của route | Tạo lần đầu vào route, **không** hủy khi rời route | Config/service cho một nhánh route, lazy feature |
+| `providers` ở component | NodeInjector của component | Mỗi instance component một bản, hủy theo component | State cục bộ của một cây component |
+
+**Hệ quả:** route con mới dưới `t/beta` tự nhận override. Nếu cần hủy state khi rời route thì dùng provider ở component, không dùng route.
+```
+
 **Xong khi:** có test chứng minh route `/t/beta/reports` nhận config override, route khác vẫn nhận default. Có 1 ADR về chỗ đặt provider.
 
 ### Ngày 6 – Router functional: interceptor, guard, resolver (Thứ Bảy 31/10, 3–4 giờ)
@@ -666,6 +841,441 @@ ng g interceptor auth --project=auth --functional
 ng g guard role --project=auth --functional
 ng g resolver tenant --project=tenant --functional
 ng test auth --no-watch
+```
+
+**Snippet:**
+
+`libs/tenant/src/tenant.interceptor.ts` – gắn `X-Tenant-Id` cho mọi request:
+
+```ts
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { TenantService } from './tenant.service';
+
+export const tenantInterceptor: HttpInterceptorFn = (req, next) => {
+  const tenantId = inject(TenantService).tenantId(); // đọc signal tại thời điểm gửi
+  return next(req.clone({ setHeaders: { 'X-Tenant-Id': tenantId } }));
+};
+```
+
+`libs/tenant/src/tenant.resolver.ts` – lấy tenant từ param `:tenantId`, nếu không có thì từ `TENANT_CONFIG` của route (Ngày 5):
+
+```ts
+import { inject } from '@angular/core';
+import { ResolveFn } from '@angular/router';
+import { TENANT_CONFIG } from './tenant.config';
+import { TenantService } from './tenant.service';
+
+export const tenantResolver: ResolveFn<string> = (route) => {
+  // Resolver chạy trong injection context của route → thấy provider override của route
+  const id = route.paramMap.get('tenantId') ?? inject(TENANT_CONFIG).tenantId;
+  inject(TenantService).setTenant(id);
+  return id;
+};
+```
+
+`libs/tenant/src/public-api.ts`: thêm `export * from './tenant.interceptor';` và `export * from './tenant.resolver';`
+
+`libs/auth/src/auth.service.ts` – token trong signal, refresh **single-flight**:
+
+```ts
+import { HttpClient, HttpContext, HttpContextToken } from '@angular/common/http';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { finalize, map, Observable, shareReplay, tap } from 'rxjs';
+
+export type Role = 'student' | 'teacher';
+export interface User {
+  id: string;
+  role: Role;
+}
+
+/** Đánh dấu request không đi qua auth interceptor (login, refresh) */
+export const SKIP_AUTH = new HttpContextToken<boolean>(() => false);
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private http = inject(HttpClient);
+  private refreshInFlight$: Observable<string> | null = null;
+
+  readonly accessToken = signal<string | null>(null);
+  readonly user = signal<User | null>(null);
+  readonly role = computed(() => this.user()?.role ?? null);
+
+  setSession(token: string, user: User) {
+    this.accessToken.set(token);
+    this.user.set(user);
+  }
+
+  login(email: string): Observable<User> {
+    return this.http
+      .post<{ accessToken: string; user: User }>(
+        '/auth/login',
+        { email },
+        { context: new HttpContext().set(SKIP_AUTH, true) },
+      )
+      .pipe(
+        tap(({ accessToken, user }) => this.setSession(accessToken, user)),
+        map(({ user }) => user),
+      );
+  }
+
+  /** N request 401 cùng lúc → chỉ 1 POST /auth/refresh, tất cả dùng chung kết quả */
+  refresh(): Observable<string> {
+    this.refreshInFlight$ ??= this.http
+      .post<{ accessToken: string }>('/auth/refresh', {}, {
+        context: new HttpContext().set(SKIP_AUTH, true), // không retry chính nó
+      })
+      .pipe(
+        map(({ accessToken }) => accessToken),
+        tap((token) => this.accessToken.set(token)),
+        finalize(() => (this.refreshInFlight$ = null)), // đợt 401 sau sẽ refresh lại
+        shareReplay({ bufferSize: 1, refCount: true }),
+      );
+    return this.refreshInFlight$;
+  }
+}
+```
+
+`libs/auth/src/auth.interceptor.ts`:
+
+```ts
+import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, switchMap, throwError } from 'rxjs';
+import { AuthService, SKIP_AUTH } from './auth.service';
+
+const withToken = (req: HttpRequest<unknown>, token: string | null) =>
+  token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  if (req.context.get(SKIP_AUTH)) return next(req);
+
+  // inject() ngay đầu hàm: trong catchError đã ra khỏi injection context
+  const auth = inject(AuthService);
+
+  return next(withToken(req, auth.accessToken())).pipe(
+    catchError((err: unknown) => {
+      if (!(err instanceof HttpErrorResponse) || err.status !== 401) {
+        return throwError(() => err);
+      }
+      // Retry đúng 1 lần; nếu vẫn 401 thì lỗi đi tiếp, không lặp
+      return auth.refresh().pipe(switchMap((token) => next(withToken(req, token))));
+    }),
+  );
+};
+```
+
+`libs/auth/src/role.guard.ts` – `CanMatchFn` để student không tải luôn chunk lazy của `/admin`:
+
+```ts
+import { inject } from '@angular/core';
+import { CanMatchFn, Router } from '@angular/router';
+import { AuthService, Role } from './auth.service';
+
+export const roleGuard =
+  (...allowed: Role[]): CanMatchFn =>
+  () => {
+    const role = inject(AuthService).role();
+    return role !== null && allowed.includes(role)
+      ? true
+      : inject(Router).createUrlTree(['/forbidden']);
+  };
+```
+
+`libs/auth/src/public-api.ts`:
+
+```ts
+export * from './auth.service';
+export * from './auth.interceptor';
+export * from './role.guard';
+```
+
+`projects/shell/src/app/core/error.interceptor.ts` – đứng **trong cùng** nên thấy lỗi trước auth; không nuốt 401:
+
+```ts
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { tap } from 'rxjs';
+
+export const errorInterceptor: HttpInterceptorFn = (req, next) =>
+  next(req).pipe(
+    tap({
+      error: (err: unknown) => {
+        if (err instanceof HttpErrorResponse && err.status >= 500) {
+          console.error(`[HTTP ${err.status}] ${req.method} ${req.urlWithParams}`);
+        }
+      },
+    }),
+  );
+```
+
+`projects/shell/src/app/app.config.ts` – thứ tự mảng = thứ tự request đi qua (tenant → auth → error → backend):
+
+```ts
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideRouter, withComponentInputBinding, withRouterConfig } from '@angular/router';
+import { authInterceptor } from '@eduhub/auth';
+import { tenantInterceptor } from '@eduhub/tenant';
+import { errorInterceptor } from './core/error.interceptor';
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      // route con nhận được param/resolve data của route cha qua input()
+      withRouterConfig({ paramsInheritanceStrategy: 'always' }),
+    ),
+    provideHttpClient(withInterceptors([tenantInterceptor, authInterceptor, errorInterceptor])),
+  ],
+};
+```
+
+`projects/shell/src/app/app.routes.ts` – lazy, resolver, guard:
+
+```ts
+import { Routes } from '@angular/router';
+import { roleGuard } from '@eduhub/auth';
+import { provideTenantConfig, tenantResolver } from '@eduhub/tenant';
+
+const tenantChildren: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'courses' },
+  { path: 'courses', loadComponent: () => import('./course-list').then((m) => m.CourseList) },
+  { path: 'reports', loadComponent: () => import('./reports/reports').then((m) => m.Reports) },
+];
+
+export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'courses' },
+  { path: 'courses', loadComponent: () => import('./course-list').then((m) => m.CourseList) },
+  {
+    path: 't/beta', // đứng trước t/:tenantId để giữ override của Ngày 5
+    providers: [provideTenantConfig({ tenantId: 'beta', currency: 'USD', features: { reports: true } })],
+    resolve: { tenant: tenantResolver },
+    children: tenantChildren,
+  },
+  { path: 't/:tenantId', resolve: { tenant: tenantResolver }, children: tenantChildren },
+  {
+    path: 'admin',
+    canMatch: [roleGuard('teacher')],
+    loadComponent: () => import('./features/admin/admin-home').then((m) => m.AdminHome),
+  },
+  { path: 'forbidden', loadComponent: () => import('./forbidden').then((m) => m.Forbidden) },
+];
+```
+
+`projects/shell/src/app/reports/reports.ts` – resolve data thành signal input:
+
+```ts
+export class Reports {
+  protected readonly config = inject(TENANT_CONFIG);
+  readonly tenant = input<string>(); // từ resolve: { tenant: tenantResolver }
+}
+```
+
+`projects/shell/src/app/course-list.ts` – bỏ header cứng, interceptor lo việc này:
+
+```ts
+state = toSignal(
+  this.http.get<Course[]>('/api/courses').pipe(
+    map((courses): State => ({ courses, error: false })),
+    catchError(() => of<State>({ courses: [], error: true })),
+    startWith<State>({ courses: [], error: false }),
+  ),
+  { requireSync: true },
+);
+```
+
+Trong `app.ts` xóa luôn đoạn gọi `/api/courses` tạm thời của Ngày 2, thay `@for` trong `app.html` bằng `<router-outlet />`.
+
+`libs/mocks/src/handlers/auth.ts`:
+
+```ts
+import { delay, http, HttpResponse } from 'msw';
+
+let seq = 0;
+
+export const authHandlers = [
+  http.post('/auth/login', async ({ request }) => {
+    const { email } = (await request.json()) as { email: string };
+    const role = email.startsWith('teacher') ? 'teacher' : 'student';
+    return HttpResponse.json({ accessToken: `token-${++seq}`, user: { id: email, role } });
+  }),
+  http.post('/auth/refresh', async () => {
+    await delay(50); // mô phỏng độ trễ mạng để thấy single-flight
+    return HttpResponse.json({ accessToken: `token-${++seq}` });
+  }),
+];
+```
+
+`libs/mocks/src/handlers/index.ts`: `export const handlers = [...coursesHandler, ...authHandlers];`
+
+`libs/testing/src/render-with-providers.ts` – thay token giả `TEST_TENANT`/`TEST_USER` bằng interceptor thật:
+
+```ts
+import { Type } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideRouter, Routes, withComponentInputBinding } from '@angular/router';
+import { render, RenderResult } from '@testing-library/angular';
+import { AuthService, authInterceptor, User } from '@eduhub/auth';
+import { TenantService, tenantInterceptor } from '@eduhub/tenant';
+
+export interface RenderOptions {
+  tenant?: string;
+  user?: User;
+  routes?: Routes;
+}
+
+export async function renderWithProviders<T>(
+  component: Type<T>,
+  { tenant = 'alpha', user, routes = [] }: RenderOptions = {},
+): Promise<RenderResult<T>> {
+  return render(component, {
+    providers: [
+      provideHttpClient(withInterceptors([tenantInterceptor, authInterceptor])),
+      provideRouter(routes, withComponentInputBinding()),
+      {
+        provide: TenantService,
+        useFactory: () => {
+          const svc = new TenantService(); // factory là injection context → effect() chạy được
+          svc.setTenant(tenant);
+          return svc;
+        },
+      },
+      {
+        provide: AuthService,
+        useFactory: () => {
+          const svc = new AuthService();
+          if (user) svc.setSession('test-token', user);
+          return svc;
+        },
+      },
+    ],
+  });
+}
+```
+
+`libs/auth/src/auth.interceptor.spec.ts` – điều kiện (1) và (2):
+
+```ts
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
+import { delay, http, HttpResponse } from 'msw';
+import { firstValueFrom } from 'rxjs';
+import { server } from '@eduhub/mocks/node';
+import { TenantService, tenantInterceptor } from '@eduhub/tenant';
+import { authInterceptor } from './auth.interceptor';
+import { AuthService } from './auth.service';
+
+describe('tenant + auth interceptor', () => {
+  let httpClient: HttpClient;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(withInterceptors([tenantInterceptor, authInterceptor]))],
+    });
+    httpClient = TestBed.inject(HttpClient);
+  });
+
+  it('mọi request có X-Tenant-Id, kể cả request bỏ qua auth', async () => {
+    const seen: (string | null)[] = [];
+    // handler không trả gì → MSW chuyển tiếp xuống handler thật
+    server.use(http.all('*', ({ request }) => void seen.push(request.headers.get('X-Tenant-Id'))));
+
+    TestBed.inject(TenantService).setTenant('beta');
+    await firstValueFrom(httpClient.get('/api/courses'));
+    await firstValueFrom(TestBed.inject(AuthService).login('student@eduhub.dev'));
+
+    expect(seen).toEqual(['beta', 'beta']);
+  });
+
+  it('3 request đồng thời nhận 401 → đúng 1 lần /auth/refresh, cả 3 retry thành công', async () => {
+    let refreshCalls = 0;
+    server.use(
+      http.get('/api/courses', ({ request }) =>
+        request.headers.get('Authorization') === 'Bearer fresh'
+          ? HttpResponse.json([])
+          : new HttpResponse(null, { status: 401 }),
+      ),
+      http.post('/auth/refresh', async () => {
+        refreshCalls++;
+        await delay(50);
+        return HttpResponse.json({ accessToken: 'fresh' });
+      }),
+    );
+    TestBed.inject(AuthService).setSession('expired', { id: 'u1', role: 'student' });
+
+    const results = await Promise.all(
+      [1, 2, 3].map(() => firstValueFrom(httpClient.get('/api/courses'))),
+    );
+
+    expect(results).toEqual([[], [], []]);
+    expect(refreshCalls).toBe(1);
+  });
+
+  it('refresh lỗi thì báo lỗi, không lặp vô hạn', async () => {
+    let refreshCalls = 0;
+    server.use(
+      http.get('/api/courses', () => new HttpResponse(null, { status: 401 })),
+      http.post('/auth/refresh', () => {
+        refreshCalls++;
+        return new HttpResponse(null, { status: 401 });
+      }),
+    );
+
+    await expect(firstValueFrom(httpClient.get('/api/courses'))).rejects.toMatchObject({ status: 401 });
+    expect(refreshCalls).toBe(1);
+  });
+});
+```
+
+`libs/auth/src/role.guard.spec.ts` – điều kiện (3):
+
+```ts
+import { Component } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { AuthService, Role } from './auth.service';
+import { roleGuard } from './role.guard';
+
+@Component({ template: `Admin` })
+class AdminPage {}
+
+@Component({ template: `Forbidden` })
+class ForbiddenPage {}
+
+async function navigateAs(role: Role, url: string) {
+  TestBed.configureTestingModule({
+    providers: [
+      provideHttpClient(),
+      provideRouter([
+        { path: 'admin', canMatch: [roleGuard('teacher')], component: AdminPage },
+        { path: 'forbidden', component: ForbiddenPage },
+      ]),
+    ],
+  });
+  TestBed.inject(AuthService).setSession('t', { id: 'u1', role });
+  const harness = await RouterTestingHarness.create();
+  await harness.navigateByUrl(url);
+  return harness;
+}
+
+describe('roleGuard', () => {
+  it('chặn student vào /admin', async () => {
+    const harness = await navigateAs('student', '/admin');
+    expect(TestBed.inject(Router).url).toBe('/forbidden');
+    expect(harness.routeNativeElement?.textContent).toContain('Forbidden');
+  });
+
+  it('cho teacher vào /admin', async () => {
+    const harness = await navigateAs('teacher', '/admin');
+    expect(TestBed.inject(Router).url).toBe('/admin');
+    expect(harness.routeNativeElement?.textContent).toContain('Admin');
+  });
+});
 ```
 
 **Xong khi:** test MSW: (1) mọi request có `X-Tenant-Id`; (2) 3 request đồng thời nhận 401 → đúng 1 lần gọi `/auth/refresh`; (3) guard chặn student vào `/admin`.
