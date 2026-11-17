@@ -13,9 +13,4 @@ import { TenantSwitcher } from './tenant-switcher/tenant-switcher';
 export class App {
   protected readonly title = signal('shell');
   private http = inject(HttpClient);
-  courses = toSignal(this.http.get<{ id: string; title: string }[]>('/api/courses', {
-    headers: {
-      'X-Tenant-Id': 'alpha'
-    }
-  }))
 }

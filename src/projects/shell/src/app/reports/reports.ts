@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { TENANT_CONFIG } from '@eduhub/tenant';
 
 @Component({
@@ -15,5 +15,6 @@ import { TENANT_CONFIG } from '@eduhub/tenant';
   `,
 })
 export class Reports {
-  protected readonly config = inject(TENANT_CONFIG)
+  protected readonly config = inject(TENANT_CONFIG);
+  readonly tenant = input<string>();
 }

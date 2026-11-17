@@ -1032,6 +1032,43 @@ export const appConfig: ApplicationConfig = {
   ],
 };
 ```
+`projects/shell/src/app/features/admin/admin-home.ts`:
+
+```ts
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AuthService } from '@eduhub/auth';
+
+@Component({
+  selector: 'app-admin-home',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <h1>Admin</h1>
+    <p>Xin chào, {{ auth.user()?.id }} ({{ auth.role() }})</p>
+  `,
+})
+export class AdminHome {
+  protected readonly auth = inject(AuthService);
+}
+```
+
+`projects/shell/src/app/forbidden.ts`:
+
+```ts
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-forbidden',
+  imports: [RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <h1>403 – Forbidden</h1>
+    <p>Bạn không có quyền truy cập trang này.</p>
+    <a routerLink="/courses">Về danh sách khoá học</a>
+  `,
+})
+export class Forbidden {}
+```
 
 `projects/shell/src/app/app.routes.ts` – lazy, resolver, guard:
 
