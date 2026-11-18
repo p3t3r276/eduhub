@@ -1349,9 +1349,279 @@ describe('roleGuard', () => {
 ng add @angular/cdk
 ng g component data-table --project=ui
 ng g component modal --project=ui
+ng g component form-field --project=ui
 ng test ui --no-watch --coverage
 mkdir -p .github/workflows   # tạo ci.yml
 git tag week-1 && git push --tags
+```
+
+**Snippet:**
+
+`libs/ui/src/lib/data-table/data-table.ts` – sort, loading, empty state:
+
+```ts
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+
+export interface Column<T> {
+  key: keyof T & string;
+  header: string;
+}
+
+@Component({
+  selector: 'eh-data-table',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    @if (loading()) {
+      <p role="status">Đang tải...</p>
+    } @else if (rows().length === 0) {
+      <p role="status">Không có dữ liệu</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            @for (col of columns(); track col.key) {
+              <th
+                scope="col"
+                role="columnheader"
+                [attr.aria-sort]="ariaSort(col.key)"
+              >
+                <button type="button" (click)="toggleSort(col.key)">{{ col.header }}</button>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of sorted(); track $index) {
+            <tr>
+              @for (col of columns(); track col.key) {
+                <td>{{ row[col.key] }}</td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  `,
+})
+export class DataTable<T extends Record<string, unknown>> {
+  readonly columns = input.required<Column<T>[]>();
+  readonly rows = input<T[]>([]);
+  readonly loading = input(false);
+
+  protected readonly sortKey = signal<string | null>(null);
+  protected readonly sortDir = signal<'asc' | 'desc'>('asc');
+
+  protected readonly sorted = computed(() => {
+    const key = this.sortKey();
+    const rows = [...this.rows()];
+    if (!key) return rows;
+    const dir = this.sortDir() === 'asc' ? 1 : -1;
+    return rows.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'vi') * dir);
+  });
+
+  protected toggleSort(key: string) {
+    if (this.sortKey() === key) {
+      this.sortDir.update((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      this.sortKey.set(key);
+      this.sortDir.set('asc');
+    }
+  }
+
+  protected ariaSort(key: string) {
+    if (this.sortKey() !== key) return 'none';
+    return this.sortDir() === 'asc' ? 'ascending' : 'descending';
+  }
+}
+```
+
+`libs/ui/src/lib/data-table/data-table.spec.ts` – truy vấn theo role, không theo class:
+
+```ts
+import { render, screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
+import { DataTable } from './data-table';
+
+const columns = [{ key: 'name', header: 'Tên' }];
+const rows = [{ name: 'Toán' }, { name: 'Anh' }, { name: 'Lý' }];
+
+const names = () =>
+  screen.getAllByRole('row').slice(1).map((r) => r.textContent?.trim());
+
+describe('DataTable', () => {
+  it('sắp xếp tăng rồi giảm khi bấm header', async () => {
+    await render(DataTable, { inputs: { columns, rows } });
+    const header = screen.getByRole('columnheader', { name: 'Tên' });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Tên' }));
+    expect(header).toHaveAttribute('aria-sort', 'ascending');
+    expect(names()).toEqual(['Anh', 'Lý', 'Toán']);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Tên' }));
+    expect(header).toHaveAttribute('aria-sort', 'descending');
+    expect(names()).toEqual(['Toán', 'Lý', 'Anh']);
+  });
+
+  it('hiện empty state', async () => {
+    await render(DataTable, { inputs: { columns, rows: [] } });
+    expect(screen.getByRole('status')).toHaveTextContent('Không có dữ liệu');
+    expect(screen.queryByRole('table')).toBeNull();
+  });
+
+  it('hiện loading state', async () => {
+    await render(DataTable, { inputs: { columns, rows, loading: true } });
+    expect(screen.getByRole('status')).toHaveTextContent('Đang tải');
+    expect(screen.queryByRole('table')).toBeNull();
+  });
+});
+```
+
+`libs/ui/src/lib/modal/modal.ts` – CDK Dialog lo focus trap, `Esc` và trả focus về nút mở:
+
+```ts
+import { Component, inject, input } from '@angular/core';
+import { DialogRef } from '@angular/cdk/dialog';
+
+@Component({
+  selector: 'eh-modal',
+  template: `
+    <div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="title()">
+      <h2>{{ title() }}</h2>
+      <ng-content />
+      <button type="button" (click)="close()">Đóng</button>
+    </div>
+  `,
+})
+export class Modal {
+  readonly title = input.required<string>();
+  private readonly ref = inject(DialogRef, { optional: true });
+
+  protected close() {
+    this.ref?.close();
+  }
+}
+```
+
+`libs/ui/src/lib/modal/modal.service.ts`:
+
+```ts
+import { Dialog } from '@angular/cdk/dialog';
+import { ComponentType } from '@angular/cdk/portal';
+import { Injectable, inject } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class ModalService {
+  private readonly dialog = inject(Dialog);
+
+  open<T>(component: ComponentType<T>, data?: unknown) {
+    return this.dialog.open(component, {
+      data,
+      hasBackdrop: true,
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+      closeOnNavigation: true,
+    });
+  }
+}
+```
+
+`libs/ui/src/lib/modal/modal.spec.ts` – `Esc` đóng và focus về nút mở:
+
+```ts
+import { Component, inject } from '@angular/core';
+import { render, screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
+import { Modal } from './modal';
+import { ModalService } from './modal.service';
+
+@Component({
+  imports: [Modal],
+  template: `<eh-modal title="Xác nhận"><p>Bạn chắc chứ?</p></eh-modal>`,
+})
+class ConfirmContent {}
+
+@Component({
+  template: `<button type="button" (click)="open()">Mở</button>`,
+})
+class Host {
+  private readonly modal = inject(ModalService);
+  open() {
+    this.modal.open(ConfirmContent);
+  }
+}
+
+describe('Modal', () => {
+  it('Esc đóng modal và trả focus về nút mở', async () => {
+    await render(Host);
+    const opener = screen.getByRole('button', { name: 'Mở' });
+
+    await userEvent.click(opener);
+    expect(await screen.findByRole('dialog', { name: 'Xác nhận' })).toBeVisible();
+
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(opener).toHaveFocus();
+  });
+});
+```
+
+`libs/ui/src/lib/form-field/form-field.ts` – nối label, hint, lỗi bằng `aria-*`:
+
+```ts
+import { Component, input } from '@angular/core';
+
+@Component({
+  selector: 'eh-form-field',
+  template: `
+    <label [for]="controlId()">{{ label() }}</label>
+    <ng-content />
+    @if (error(); as message) {
+      <p [id]="controlId() + '-error'" role="alert">{{ message }}</p>
+    }
+  `,
+})
+export class FormField {
+  readonly label = input.required<string>();
+  readonly controlId = input.required<string>();
+  readonly error = input<string | null>(null);
+}
+```
+
+`.github/workflows/ci.yml`:
+
+```yaml
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+      - run: npx ng test ui --no-watch --coverage
+```
+
+Đặt ngưỡng coverage trong `angular.json` (target `test` của `ui`) để CI tự fail khi dưới 80%:
+
+```json
+"options": {
+  "tsConfig": "projects/libs/ui/tsconfig.spec.json",
+  "setupFiles": ["projects/shell/src/test-setup.ts"],
+  "coverageThresholds": { "statements": 80, "branches": 80, "functions": 80, "lines": 80 }
+}
 ```
 
 **Xong khi:** CI xanh, coverage `ui` ≥ 80%, đã viết retro tuần 1.
@@ -1381,6 +1651,48 @@ Từ tuần này đến hết Tuần 3, feature đặt trong `projects/shell/src
 ng test util --no-watch
 ```
 
+**Snippet:**
+
+`libs/util/src/rx/flattening.spec.ts` – cùng một input marble, chỉ đổi operator:
+
+```ts
+import { concatMap, exhaustMap, mergeMap, Observable, switchMap } from 'rxjs';
+import { TestScheduler } from 'rxjs/testing';
+
+describe('flattening operators', () => {
+  let scheduler: TestScheduler;
+
+  beforeEach(() => {
+    scheduler = new TestScheduler((actual, expected) => expect(actual).toEqual(expected));
+  });
+
+  // outer phát 'a' ở frame 0 và 'b' ở frame 4; mỗi inner phát x ở +2, y ở +5, xong ở +6
+  const cases: [string, (project: () => Observable<string>) => (o: Observable<string>) => Observable<string>, string][] = [
+    ['mergeMap: chạy song song, kết quả xen kẽ', (p) => mergeMap(p), '--x--yx--y|'],
+    ['switchMap: b hủy inner của a, mất y của a', (p) => switchMap(p), '--x---x--y|'],
+    ['concatMap: b chờ a xong rồi mới chạy', (p) => concatMap(p), '--x--y--x--y|'],
+    ['exhaustMap: b bị bỏ qua vì a còn đang chạy', (p) => exhaustMap(p), '--x--y|'],
+  ];
+
+  it.each(cases)('%s', (_name, operator, expected) => {
+    scheduler.run(({ cold, expectObservable }) => {
+      const outer = cold('a---b|');
+      const inner = () => cold('--x--y|');
+      expectObservable(outer.pipe(operator(inner))).toBe(expected);
+    });
+  });
+});
+```
+
+Bảng ghi vào `docs/journal.md`:
+
+| Operator | Khi nào dùng | Ví dụ trong EduHub |
+| --- | --- | --- |
+| `switchMap` | chỉ cần kết quả mới nhất, hủy cái cũ | tìm kiếm khóa học |
+| `mergeMap` | song song, thứ tự không quan trọng | upload nhiều file (giới hạn `concurrent`) |
+| `concatMap` | tuần tự, giữ đúng thứ tự | lưu điểm từng học sinh |
+| `exhaustMap` | bỏ qua khi đang xử lý | nút nộp bài (chống double-submit) |
+
 **Xong khi:** 4 marble test xanh và bảng so sánh có ví dụ thật: tìm kiếm, upload, lưu theo thứ tự, nộp bài.
 
 ### Ngày 9 – Typeahead tìm khóa học (Thứ Ba 3/11)
@@ -1400,6 +1712,205 @@ ng test util --no-watch
 ```bash
 ng g component features/catalog/course-search --project=shell
 ng test data-access --no-watch
+```
+
+**Snippet:**
+
+`libs/mocks/src/handlers/courses.ts` – thêm handler tìm kiếm, từ khóa "ang" cố tình chậm:
+
+```ts
+import { delay } from 'msw';
+
+http.get('/api/courses/search', async ({ request }) => {
+  const q = new URL(request.url).searchParams.get('q') ?? '';
+  await delay(q.startsWith('ang') ? 800 : 100);
+  const tenantId = request.headers.get('X-Tenant-Id') ?? '';
+  return HttpResponse.json(
+    db.course.findMany({
+      where: { tenantId: { equals: tenantId }, title: { contains: q } },
+    }),
+  );
+}),
+```
+
+`libs/data-access/src/lib/course-search.ts` – `catchError` nằm **trong** `switchMap`:
+
+```ts
+import { Observable, catchError, debounceTime, distinctUntilChanged, map, of, startWith, switchMap } from 'rxjs';
+
+export interface Course {
+  id: string;
+  title: string;
+}
+
+export interface SearchState {
+  status: 'idle' | 'loading' | 'success' | 'empty' | 'error';
+  data: Course[];
+  error: string | null;
+}
+
+export const IDLE: SearchState = { status: 'idle', data: [], error: null };
+const LOADING: SearchState = { status: 'loading', data: [], error: null };
+
+export function searchCourses(
+  term$: Observable<string>,
+  fetchCourses: (q: string) => Observable<Course[]>,
+  debounceMs = 300,
+): Observable<SearchState> {
+  return term$.pipe(
+    map((t) => t.trim()),
+    debounceTime(debounceMs),
+    distinctUntilChanged(),
+    switchMap((term) =>
+      term.length < 2
+        ? of(IDLE)
+        : fetchCourses(term).pipe(
+            map((data): SearchState => ({ status: data.length ? 'success' : 'empty', data, error: null })),
+            startWith(LOADING),
+            catchError(() => of<SearchState>({ status: 'error', data: [], error: 'Không tìm được, thử lại' })),
+          ),
+    ),
+  );
+}
+```
+
+`libs/data-access/src/lib/course-search.spec.ts` – marble test debounce và hủy request cũ:
+
+```ts
+import { TestScheduler } from 'rxjs/testing';
+import { Course, SearchState, searchCourses } from './course-search';
+
+describe('searchCourses', () => {
+  let scheduler: TestScheduler;
+  const loading: SearchState = { status: 'loading', data: [], error: null };
+  const result = (title: string): SearchState => ({
+    status: 'success',
+    data: [{ id: title, title }],
+    error: null,
+  });
+
+  beforeEach(() => {
+    scheduler = new TestScheduler((actual, expected) => expect(actual).toEqual(expected));
+  });
+
+  it('debounce: chỉ từ khóa cuối được gửi đi', () => {
+    scheduler.run(({ hot, cold, expectObservable }) => {
+      const term$ = hot('a 100ms b', { a: 'ang', b: 'rxjs' });
+      const fetch = () => cold<Course[]>('50ms r|', { r: [{ id: 'rxjs', title: 'rxjs' }] });
+
+      expectObservable(searchCourses(term$, fetch)).toBe('401ms l 49ms s', {
+        l: loading,
+        s: result('rxjs'),
+      });
+    });
+  });
+
+  it('switchMap: request cũ bị hủy, kết quả muộn không ghi đè', () => {
+    scheduler.run(({ hot, cold, expectObservable }) => {
+      const term$ = hot('a 400ms b', { a: 'ang', b: 'rxjs' });
+      const fetch = (q: string) =>
+        q === 'ang'
+          ? cold<Course[]>('1000ms s|', { s: [{ id: 'ang', title: 'ang' }] })
+          : cold<Course[]>('50ms r|', { r: [{ id: 'rxjs', title: 'rxjs' }] });
+
+      expectObservable(searchCourses(term$, fetch)).toBe('300ms l 400ms l 49ms s', {
+        l: loading,
+        s: result('rxjs'),
+      });
+    });
+  });
+});
+```
+
+`projects/shell/src/app/features/catalog/course-search/course-search.ts`:
+
+```ts
+import { HttpClient } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Course, IDLE, searchCourses } from '@eduhub/data-access';
+
+@Component({
+  selector: 'app-course-search',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <label for="q">Tìm khóa học</label>
+    <input id="q" #q type="search" [value]="term()" (input)="term.set(q.value)" />
+
+    @switch (state().status) {
+      @case ('loading') { <p role="status">Đang tìm...</p> }
+      @case ('error') { <p role="alert">{{ state().error }}</p> }
+      @case ('empty') { <p role="status">Không có khóa học phù hợp</p> }
+      @case ('success') {
+        <ul>
+          @for (c of state().data; track c.id) {
+            <li>{{ c.title }}</li>
+          }
+        </ul>
+      }
+    }
+  `,
+})
+export class CourseSearch {
+  private readonly http = inject(HttpClient);
+  protected readonly term = signal('');
+  protected readonly state = toSignal(
+    searchCourses(toObservable(this.term), (q) =>
+      this.http.get<Course[]>('/api/courses/search', { params: { q } }),
+    ),
+    { initialValue: IDLE },
+  );
+}
+```
+
+`course-search.spec.ts` – test MSW: race condition và phục hồi sau lỗi 500:
+
+```ts
+import { provideHttpClient } from '@angular/common/http';
+import { render, screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
+import { delay, http, HttpResponse } from 'msw';
+import { server } from '@eduhub/mocks/node';
+import { CourseSearch } from './course-search';
+
+const setup = () => render(CourseSearch, { providers: [provideHttpClient()] });
+
+it('gõ "ang" (chậm) rồi "rxjs" (nhanh): kết quả cuối là rxjs', async () => {
+  server.use(
+    http.get('/api/courses/search', async ({ request }) => {
+      const q = new URL(request.url).searchParams.get('q');
+      await delay(q === 'ang' ? 800 : 100);
+      return HttpResponse.json([{ id: q, title: `kết quả ${q}` }]);
+    }),
+  );
+  await setup();
+  const box = screen.getByRole('searchbox');
+
+  await userEvent.type(box, 'ang');
+  await new Promise((r) => setTimeout(r, 400)); // request "ang" đã bay đi
+  await userEvent.clear(box);
+  await userEvent.type(box, 'rxjs');
+
+  expect(await screen.findByText('kết quả rxjs')).toBeVisible();
+  await new Promise((r) => setTimeout(r, 1000)); // đợi "ang" về muộn
+  expect(screen.queryByText('kết quả ang')).toBeNull();
+  expect(screen.getByText('kết quả rxjs')).toBeVisible();
+});
+
+it('server trả 500 một lần, gõ tiếp vẫn tìm được', async () => {
+  server.use(
+    http.get('/api/courses/search', () => new HttpResponse(null, { status: 500 }), { once: true }),
+    http.get('/api/courses/search', () => HttpResponse.json([{ id: '1', title: 'ổn rồi' }])),
+  );
+  await setup();
+  const box = screen.getByRole('searchbox');
+
+  await userEvent.type(box, 'abc');
+  expect(await screen.findByRole('alert')).toHaveTextContent('Không tìm được');
+
+  await userEvent.type(box, 'd');
+  expect(await screen.findByText('ổn rồi')).toBeVisible();
+});
 ```
 
 **Xong khi:** (1) marble test debounce + hủy request cũ; (2) test MSW gõ "ang" (chậm 800ms) rồi "rxjs" (nhanh 100ms), kết quả cuối là "rxjs"; (3) server trả 500 một lần, gõ tiếp vẫn tìm được.
