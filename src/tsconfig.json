@@ -12,6 +12,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
+    "rootDir": ".",
     "module": "preserve",
     "paths": {
       "@eduhub/auth": ["./projects/libs/auth/src/public-api.ts"],

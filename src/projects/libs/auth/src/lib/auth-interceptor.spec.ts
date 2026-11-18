@@ -1,13 +1,16 @@
 import { TestBed } from "@angular/core/testing";
-import { HttpInterceptorFn } from "@angular/common/http";
-import { authInterceptor } from "./auth-interceptor";
+import { HttpClient, HttpInterceptorFn, provideHttpClient, withInterceptors } from "@angular/common/http";
+import { AuthService, authInterceptor } from "@eduhub/auth";
+import { TenantService, tenantInterceptor } from "@eduhub/tenant";
 
-describe("authInterceptor", () => {
-	const interceptor: HttpInterceptorFn = (req, next) =>
-		TestBed.runInInjectionContext(() => authInterceptor(req, next));
+describe("tenant + auth interceptor", () => {
+	let httpClient: HttpClient;
 
 	beforeEach(() => {
-		TestBed.configureTestingModule({});
+		TestBed.configureTestingModule({
+			providers: [provideHttpClient(withInterceptors([tenantInterceptor, authInterceptor]))]
+		});
+		httpClient = TestBed.inject(HttpClient);
 	});
 
 	it("should be created", () => {
