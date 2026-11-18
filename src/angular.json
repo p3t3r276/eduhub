@@ -174,7 +174,9 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/libs/auth/tsconfig.spec.json"
+            "tsConfig": "projects/libs/auth/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": ["projects/shell/src/test-setup.ts"]
           }
         },
         "lint": {

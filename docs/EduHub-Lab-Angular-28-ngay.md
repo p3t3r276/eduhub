@@ -346,6 +346,7 @@ Template: `@for (c of courses(); track c.id) { <li>{{ c.title }}</li> }`
 **Chú ý:**
 
 - `setupFiles` trong target `test` của `angular.json` trỏ tới `test-setup.ts`: `beforeAll(server.listen)`, `afterEach(server.resetHandlers + seed lại db)`, `afterAll(server.close)`.
+- `setupFiles` chỉ áp dụng cho từng target `test`. Spec nằm trong lib (ví dụ `libs/auth` có `auth-interceptor.spec.ts` dùng `server.use()`) cũng phải khai báo cùng `setupFiles` trong target `test` của lib đó. Nếu thiếu, MSW server không được `listen`, request ra mạng thật và lỗi `HttpErrorResponse` với `status: 0` thay vì kết quả đã mock.
 - Dùng `provideHttpClient()` (mặc định đã dùng Fetch, `withFetch()` đã deprecated) để app và test cùng một đường HTTP.
 - `renderWithProviders()` trong `libs/testing` nhận tham số `tenant`, `user`, `routes` để mỗi test chỉ khai báo điều nó quan tâm.
 
@@ -832,6 +833,7 @@ describe('TENANT_CONFIG', () => {
 - Không retry request refresh chính nó, tránh vòng lặp vô hạn.
 - Bật `withComponentInputBinding()` để param route thành signal input.
 - Thứ tự interceptor quan trọng: tenant → auth → error.
+- `setupFiles` ở Ngày 3 chỉ nằm trong target `test` của shell. Spec của `libs/auth` (như `auth-interceptor.spec.ts`, dùng `server.use()`) chạy bằng target `test` riêng, nên phải khai báo `setupFiles` trỏ tới `projects/shell/src/test-setup.ts` trong target `test` của `auth` (và `tenant` nếu có spec dùng MSW). Thiếu bước này, MSW server không được `listen`, request ra mạng thật và test lỗi `HttpErrorResponse` với `status: 0` thay vì 401/dữ liệu đã mock.
 
 **Lệnh:**
 
@@ -1265,6 +1267,18 @@ describe('tenant + auth interceptor', () => {
     expect(refreshCalls).toBe(1);
   });
 });
+```
+
+`angular.json` – target `test` của auth:
+
+```json
+"test": {
+  "builder": "@angular/build:unit-test",
+  "options": {
+    "runner": "vitest",
+    "setupFiles": ["projects/shell/src/test-setup.ts"]
+  }
+}
 ```
 
 `libs/auth/src/role.guard.spec.ts` – điều kiện (3):

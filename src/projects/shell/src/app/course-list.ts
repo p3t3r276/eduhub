@@ -32,7 +32,7 @@ export class CourseList {
 	private http = inject(HttpClient);
 	state = toSignal(
 		this.http
-			.get<Course[]>("/api/courses", { headers: { "X-Tenant-Id": "alpha" } })
+			.get<Course[]>("/api/courses")
 			.pipe(
 				map((courses): State => ({ courses, error: false })),
 				catchError(() => of<State>({ courses: [], error: true })),
