@@ -1340,6 +1340,7 @@ describe('roleGuard', () => {
 **Chú ý:**
 
 - `DataTable`: sort, empty state, loading state. Test bằng `getByRole('columnheader')`, không dùng class CSS.
+- `libs/ui` có target `test` riêng, cần `test-setup.ts` với jest-dom (xem snippet), nếu không `toHaveAttribute` lỗi `Invalid Chai property`.
 - `Modal` dùng CDK Overlay: focus trap, `Esc` để đóng, trả focus về nút mở.
 - CI chỉ cần `npm ci` → `npm run verify`. E2E thêm từ Tuần 3.
 
@@ -1356,6 +1357,30 @@ git tag week-1 && git push --tags
 ```
 
 **Snippet:**
+
+`projects/libs/ui/src/test-setup.ts` – matcher jest-dom cho spec của `ui` (không cần MSW):
+
+```ts
+import '@testing-library/jest-dom/vitest';
+```
+
+`angular.json` – target `test` của `ui`:
+
+```json
+"test": {
+  "builder": "@angular/build:unit-test",
+  "options": {
+    "tsConfig": "projects/libs/ui/tsconfig.spec.json",
+    "setupFiles": ["projects/libs/ui/src/test-setup.ts"]
+  }
+}
+```
+
+`projects/libs/ui/tsconfig.spec.json` – thêm `test-setup.ts` vào `include`:
+
+```json
+"include": ["src/**/*.d.ts", "src/**/*.spec.ts", "src/test-setup.ts"]
+```
 
 `libs/ui/src/lib/data-table/data-table.ts` – sort, loading, empty state:
 
