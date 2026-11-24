@@ -1554,7 +1554,7 @@ export class ModalService {
 
 ```ts
 import { Component, inject } from '@angular/core';
-import { render, screen } from '@testing-library/angular';
+import { fireEvent, render, screen, waitFor } from "@testing-library/angular";
 import userEvent from '@testing-library/user-event';
 import { Modal } from './modal';
 import { ModalService } from './modal.service';
@@ -1576,17 +1576,38 @@ class Host {
 }
 
 describe('Modal', () => {
-  it('Esc đóng modal và trả focus về nút mở', async () => {
-    await render(Host);
-    const opener = screen.getByRole('button', { name: 'Mở' });
+  it("Esc đóng modal và trả focus về nút mở", async () => {
+		await render(Host);
+		const opener = screen.getByRole("button", { name: "Mở" });
 
-    await userEvent.click(opener);
-    expect(await screen.findByRole('dialog', { name: 'Xác nhận' })).toBeVisible();
+		await userEvent.click(opener);
+		expect(
+			await screen.findByRole("dialog", { name: "Xác nhận" }),
+		).toBeVisible();
 
-    await userEvent.keyboard('{Escape}');
-    expect(screen.queryByRole('dialog')).toBeNull();
-    expect(opener).toHaveFocus();
-  });
+		//await userEvent.keyboard('{Escape}');
+		fireEvent.keyDown(document.activeElement ?? document.body, {
+			key: "Escape",
+			code: "Escape",
+			keyCode: 27,
+		});
+		await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+		expect(opener).toHaveFocus();
+	});
+
+	it("nút Đóng đóng modal và trả focus về nút mở", async () => {
+		await render(Host);
+		const opener = screen.getByRole("button", { name: "Mở" });
+
+		await userEvent.click(opener);
+		expect(
+			await screen.findByRole("dialog", { name: "Xác nhận" }),
+		).toBeVisible();
+
+		await userEvent.click(screen.getByRole("button", { name: "Đóng" }));
+		expect(screen.queryByRole("dialog")).toBeNull();
+		expect(opener).toHaveFocus();
+	});
 });
 ```
 
