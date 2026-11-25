@@ -106,7 +106,8 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/libs/ui/tsconfig.spec.json",
-            "setupFiles": ["projects/libs/ui/src/test-setup.ts"]
+            "setupFiles": ["projects/libs/ui/src/test-setup.ts"],
+            "coverageThresholds": { "statements": 80, "branches": 80, "functions": 80, "lines": 80 }
           }
         },
         "lint": {

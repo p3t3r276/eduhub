@@ -30,7 +30,6 @@ describe("Modal", () => {
 			await screen.findByRole("dialog", { name: "Xác nhận" }),
 		).toBeVisible();
 
-		//await userEvent.keyboard('{Escape}');
 		fireEvent.keyDown(document.activeElement ?? document.body, {
 			key: "Escape",
 			code: "Escape",
